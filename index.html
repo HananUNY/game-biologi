@@ -76,13 +76,12 @@
             overflow: hidden;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end; /* PENTING: Agar kaki karakter napak tanah */
+            align-items: flex-end;
             padding: 0 50px 40px 50px;
         }
 
         .bg-prop { display: none; }
 
-        /* PERBAIKAN UKURAN KARAKTER */
         .character-sprite {
             position: relative;
             width: 300px; 
@@ -94,13 +93,19 @@
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Class untuk GIF Custom */
         .char-gif {
             width: 100%;        
             height: auto;       
             max-height: 100%;   
-            image-rendering: pixelated; /* Agar pixel art tetap tajam saat diperbesar */
+            image-rendering: pixelated;
             filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
+            transition: filter 0.1s; 
+        }
+
+        /* EFEK MERAH (DAMAGE FLASH) - UPDATED */
+        /* Menggunakan grayscale dulu lalu sepia dan hue-rotate untuk memaksa warna merah */
+        .damage-flash {
+            filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(2) !important;
         }
 
         .boss-mode {
@@ -446,9 +451,7 @@
             
             /* ADJUST CHARACTER SIZE IN MOBILE */
             .character-sprite { width: 130px; height: 130px; }
-            .char-gif { /* Reset scale issues in mobile */
-                max-height: 130px;
-            }
+            .char-gif { max-height: 130px; }
             
             .top-hud { top: 2px; left: 5px; right: 5px; }
             .player-status { padding: 3px; width: 45%; }
@@ -972,10 +975,14 @@
             // RESET IMAGES & VISUALS
             const p2Img = document.getElementById('p2-img');
             const p2Char = document.getElementById('p2-char');
+            const p1Char = document.getElementById('p1-char');
             
             p2Char.classList.remove('boss-mode');
             state.bossLives = 0;
             p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
+            
+            // Animation Logic for Player 1 Attack (GIF Swap)
+            // We need to make sure P1 attack logic can access this later
 
             if(state.gameMode === 'single') {
                 let enemyName = `PATOGEN LV.${state.level}`;
@@ -1145,11 +1152,36 @@
         function attackAnim(attacker, defender, isCrit) {
             const char1 = document.getElementById(`${attacker}-char`);
             const char2 = document.getElementById(`${defender}-char`);
+            
+            // Logic khusus untuk P1 (Imun) ganti GIF attack
+            if (attacker === 'p1') {
+                const p1Img = document.getElementById('p1-img');
+                // Simpan src idle
+                const idleSrc = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif";
+                // Ganti ke attack src
+                p1Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune_attack.gif";
+                
+                // Kembalikan ke idle setelah animasi selesai (misal 1 detik atau 800ms)
+                // Kita asumsikan durasi animasi attack sekitar 1 detik
+                setTimeout(() => {
+                    p1Img.src = idleSrc;
+                }, 1000); 
+            }
+
             const moveVal = attacker === 'p1' ? '50px' : '-50px';
+            
             char1.style.transform = `translateX(${moveVal}) ${attacker === 'p2' ? 'scaleX(-1)' : ''}`;
+            
             setTimeout(() => {
                 let damageText = isCrit ? "CRITICAL! -30" : "-15";
                 showDamage(defender, damageText, isCrit);
+                // Tambahkan efek merah (damage flash) ke GAMBAR lawan
+                const targetImg = document.getElementById(`${defender}-img`);
+                if(targetImg) {
+                    targetImg.classList.add('damage-flash');
+                    setTimeout(() => targetImg.classList.remove('damage-flash'), 400);
+                }
+
                 char2.classList.add('shake');
                 char1.style.transform = attacker === 'p2' ? 'scaleX(-1)' : 'none';
                 setTimeout(() => char2.classList.remove('shake'), 500);
@@ -1319,14 +1351,23 @@
             if (state.typeWriterInterval) clearInterval(state.typeWriterInterval);
             state = { p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 }, p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 }, qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] }, gameMode: 'single', level: 1, aiTimer: null };
             
-            // FORCE RESET BOSS VISUAL
+            // FORCE RESET BOSS VISUAL (FIXED NULL ERROR)
             const p2Char = document.getElementById('p2-char');
-            p2Char.classList.remove('boss-mode');
-            p2Char.style.transform = 'scaleX(-1)';
-            document.getElementById('p1-char').style.transform = 'none';
+            if (p2Char) {
+                p2Char.classList.remove('boss-mode');
+                p2Char.style.transform = 'scaleX(-1)';
+            }
+            
+            const p1Char = document.getElementById('p1-char');
+            if (p1Char) {
+                // Find child if p1-char is wrapper, or style directly
+                const sprite = p1Char.querySelector('.character-sprite') || p1Char;
+                if (sprite && sprite.style) sprite.style.transform = 'none';
+            }
 
             // RESET IMAGES TO DEFAULT
-            document.getElementById('p2-img').src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
+            const p2Img = document.getElementById('p2-img');
+            if (p2Img) p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
 
             document.getElementById('p1-input-name').value = "";
             document.getElementById('p1-input-class').value = "";
@@ -1341,8 +1382,8 @@
             const spinner = document.getElementById('btn-spinner');
             const btnText = document.getElementById('btn-text');
             if (btnText) btnText.innerText = "▶️ MULAI GAME";
-            btn.disabled = false;
-            spinner.style.display = 'none';
+            if (btn) btn.disabled = false;
+            if (spinner) spinner.style.display = 'none';
 
             document.getElementById('game-over-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
@@ -1357,6 +1398,7 @@
             focusInput('p1-input-name');
         }
 
+        // --- LEADERBOARD LOGIC (MERGED) ---
         async function openLeaderboard() {
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('leaderboard-screen').style.display = 'flex';
