@@ -33,8 +33,8 @@
             padding: 0;
             background-color: #000;
             font-family: 'Press Start 2P', cursive;
-            overflow: hidden;
-            /* Menggunakan dvh untuk mobile agar address bar tidak menutupi */
+            /* Ubah overflow jadi auto agar jika terpotong masih bisa discroll sedikit */
+            overflow: hidden; 
             height: 100vh; 
             height: 100dvh; 
             width: 100vw;
@@ -287,22 +287,23 @@
             z-index: 999;
             text-align: center;
             padding: 10px;
-            overflow-y: auto;
+            overflow-y: auto; /* Izinkan scroll jika konten terlalu panjang di HP */
         }
-        #start-screen { justify-content: center; }
+        #start-screen { justify-content: center; padding-top: 2vh; }
         
-        .modal h1 { color: gold; font-size: 2rem; margin: 10px 0; text-shadow: 4px 4px 0 #a00; }
+        .modal h1 { color: gold; font-size: 2rem; margin: 5px 0 10px 0; text-shadow: 4px 4px 0 #a00; }
         
         /* NEW BUTTON LAYOUT */
         .btn-row { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            gap: 15px; 
-            margin-top: 15px; 
-            margin-bottom: 10px; 
+            gap: 10px; 
+            margin-top: 10px; 
+            margin-bottom: 20px; 
             width: 100%;
             max-width: 900px;
+            flex-wrap: wrap; /* Agar tombol turun jika layar sangat sempit */
         }
 
         .start-btn {
@@ -310,66 +311,68 @@
             color: white; font-family: 'Press Start 2P'; font-size: 1.2rem;
             border: 4px solid #fff; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            min-width: 250px;
+            min-width: 200px; /* Sedikit dikecilkan min-width agar muat */
             box-shadow: 0 0 15px #00ff00;
             animation: pulse 2s infinite;
+            order: 2; /* Posisi Tengah */
         }
         .start-btn:disabled { background: #555; cursor: wait; animation: none; box-shadow: none; }
 
         .secondary-btn {
-            background: #0088cc; padding: 12px 20px;
-            color: white; font-family: 'Press Start 2P'; font-size: 0.7rem;
+            background: #0088cc; padding: 10px 15px;
+            color: white; font-family: 'Press Start 2P'; font-size: 0.6rem;
             border: 2px solid #fff; cursor: pointer;
-            min-width: 120px;
+            min-width: 100px;
             transition: transform 0.1s;
         }
         .secondary-btn:active { transform: translateY(3px); }
-        .settings-btn { background: #555; color: #ccc; border-color: #999; }
-        .leaderboard-btn { background: #0088cc; border-color: #00ffff; }
+        
+        .settings-btn { background: #555; color: #ccc; border-color: #999; order: 1; } /* Kiri */
+        .leaderboard-btn { background: #0088cc; border-color: #00ffff; order: 3; } /* Kanan */
 
         /* INPUT FORM STYLES */
         .form-container {
-            display: flex; justify-content: center; gap: 20px; width: 100%; max-width: 900px; margin-bottom: 10px;
+            display: flex; justify-content: center; gap: 15px; width: 100%; max-width: 900px; margin-bottom: 5px;
         }
         .player-form {
-            flex: 1; background: rgba(0,0,0,0.6); border: 2px solid #fff; padding: 10px; border-radius: 10px;
+            flex: 1; background: rgba(0,0,0,0.6); border: 2px solid #fff; padding: 8px; border-radius: 10px;
             transition: all 0.3s;
         }
         .player-form.hidden { display: none; }
-        .form-title { font-size: 0.8rem; margin-bottom: 10px; text-decoration: underline; }
-        .input-group { margin-bottom: 8px; text-align: left; }
-        .input-label { font-size: 0.6rem; color: #aaa; margin-bottom: 2px; display: block; }
+        .form-title { font-size: 0.7rem; margin-bottom: 5px; text-decoration: underline; }
+        .input-group { margin-bottom: 5px; text-align: left; }
+        .input-label { font-size: 0.5rem; color: #aaa; margin-bottom: 2px; display: block; }
         .rpg-input {
-            width: 100%; padding: 8px; background: #222; border: 2px solid #555;
-            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.7rem; outline: none;
+            width: 100%; padding: 6px; background: #222; border: 2px solid #555;
+            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.6rem; outline: none;
         }
         .rpg-input:focus { border-color: gold; background: #333; }
 
         /* MODE TOGGLE */
-        .mode-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .mode-selector { display: flex; gap: 10px; margin-bottom: 10px; }
         .mode-btn {
-            padding: 10px 15px; border: 2px solid #555; background: #222; color: #aaa;
-            font-family: 'Press Start 2P'; cursor: pointer; font-size: 0.7rem;
+            padding: 8px 15px; border: 2px solid #555; background: #222; color: #aaa;
+            font-family: 'Press Start 2P'; cursor: pointer; font-size: 0.6rem;
         }
         .mode-btn.active { border-color: gold; color: gold; background: #333; box-shadow: 0 0 10px gold; }
 
-        /* VIRTUAL KEYBOARD (BIGGER) */
+        /* VIRTUAL KEYBOARD (BIGGER KEYS) */
         #virtual-keyboard {
             width: 100%; max-width: 950px; background: #2e1a12; border: 3px solid #8b4513;
-            padding: 10px; display: flex; flex-direction: column; gap: 6px; margin-top: 5px;
+            padding: 8px; display: flex; flex-direction: column; gap: 5px; margin-top: 5px;
         }
-        .kb-row { display: flex; justify-content: center; gap: 5px; }
+        .kb-row { display: flex; justify-content: center; gap: 3px; }
         .kb-key {
-            padding: 15px 0; 
-            width: 50px;  /* Lebih lebar */
+            padding: 12px 0; /* Tinggi tombol diperbesar */
+            width: 40px;     /* Lebar tombol diperbesar */
             background: #5d4037; border: 2px solid #8b4513;
-            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 1rem; 
-            cursor: pointer; box-shadow: 0 4px 0 #3e2723;
+            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.9rem; 
+            cursor: pointer; box-shadow: 0 3px 0 #3e2723;
             touch-action: manipulation; 
         }
-        .kb-key:active { transform: translateY(4px); box-shadow: none; }
-        .kb-key.wide { width: 100px; }
-        .kb-key.space { width: 300px; }
+        .kb-key:active { transform: translateY(3px); box-shadow: none; }
+        .kb-key.wide { width: 80px; }
+        .kb-key.space { width: 250px; }
 
         /* TUTORIAL & SETTINGS */
         .tutorial-content, .settings-content {
@@ -390,18 +393,18 @@
             padding: 15px; margin-bottom: 10px;
             display: flex; flex-direction: column; align-items: center;
         }
-        .lb-filters { display: flex; gap: 15px; margin-bottom: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
+        .lb-filters { display: flex; gap: 10px; margin-bottom: 10px; width: 100%; justify-content: center; flex-wrap: wrap; }
         .lb-filter-group { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
-        .lb-filter-group label { font-size: 0.6rem; color: #aaa; text-transform: uppercase; }
+        .lb-filter-group label { font-size: 0.5rem; color: #aaa; text-transform: uppercase; }
         .lb-select {
-            padding: 8px; background: #222; color: white; border: 2px solid #8b4513;
-            font-family: 'Press Start 2P', cursive; font-size: 0.6rem; cursor: pointer; min-width: 200px;
+            padding: 6px; background: #222; color: white; border: 2px solid #8b4513;
+            font-family: 'Press Start 2P', cursive; font-size: 0.5rem; cursor: pointer; min-width: 150px;
         }
         .lb-select:hover { border-color: gold; }
         .lb-table-wrapper { width: 100%; overflow-y: auto; max-height: 50vh; border: 1px solid #444; }
         .lb-table { width: 100%; border-collapse: collapse; font-size: 0.6rem; text-align: left; }
-        .lb-table th { background: #5d4037; color: gold; padding: 12px 8px; position: sticky; top: 0; border-bottom: 2px solid #8b4513; }
-        .lb-table td { padding: 10px 8px; border-bottom: 1px dashed #555; line-height: 1.6; vertical-align: top; }
+        .lb-table th { background: #5d4037; color: gold; padding: 10px 5px; position: sticky; top: 0; border-bottom: 2px solid #8b4513; }
+        .lb-table td { padding: 8px 5px; border-bottom: 1px dashed #555; line-height: 1.4; vertical-align: top; }
         .lb-table tr:hover { background: rgba(255, 255, 255, 0.05); }
         .lb-close { background: #aa0000; margin-top: 10px; padding: 10px 30px; font-size: 0.8rem; border: 2px solid white; cursor: pointer; color: white; font-family: inherit; }
         .lb-refresh { background: #00aa00; padding: 8px 15px; font-size: 0.6rem; border: 2px solid white; cursor: pointer; color: white; font-family: inherit; margin-bottom: 15px; }
@@ -431,36 +434,43 @@
             #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel { display: none !important; }
         }
 
+        /* MEDIA QUERY KHUSUS UNTUK HP LANDSCAPE (Tinggi Kecil) */
         @media only screen and (max-width: 900px) and (orientation: landscape) {
-            #scene-area { flex: 1.5; padding: 0 10px 10px 10px; }
+            #scene-area { flex: 1; padding: 0 10px 10px 10px; } /* Scene area lebih kecil */
             .bg-prop { font-size: 3rem; }
-            .sprite-img { font-size: 3.5rem; }
-            .character-sprite { width: 60px; height: 60px; }
-            .top-hud { top: 5px; left: 5px; right: 5px; }
-            .player-status { padding: 5px; width: 42%; }
-            .player-status span { font-size: 0.5rem !important; }
-            .hp-bar-container { height: 8px; }
-            .atp-bar-container { height: 4px; }
-            #control-panel { flex: 2.5; padding: 5px; gap: 5px; border-top-width: 3px; }
-            .rpg-box { padding: 10px; }
-            #q-title { font-size: 0.6rem; margin-bottom: 5px; }
-            #q-text { font-size: 0.7rem; line-height: 1.3; }
-            .p-label { font-size: 0.5rem; margin-bottom: 2px; }
-            .btn-rpg { padding: 6px 4px; font-size: 0.55rem; }
-            .skill-btn { padding: 4px 2px; }
-            .skill-emoji { font-size: 0.8rem; }
-            .skill-btn span { font-size: 0.4rem; }
-            .form-container { gap: 10px; margin-bottom: 5px; }
-            .player-form { padding: 8px; }
-            .form-title { font-size: 0.6rem; margin-bottom: 5px; }
-            .input-label { font-size: 0.5rem; }
-            .rpg-input { padding: 5px; font-size: 0.6rem; }
-            #virtual-keyboard { gap: 3px; padding: 5px; margin-top: 5px; }
-            .kb-key { padding: 10px 0; font-size: 0.8rem; width: 35px; }
-            .kb-key.wide { width: 70px; }
-            .kb-key.space { width: 150px; }
-            .modal h1 { font-size: 1.5rem; margin: 5px 0; }
-            .start-btn, .leaderboard-btn, .lb-close, .settings-btn { padding: 8px 15px; font-size: 0.8rem; margin-top: 5px; }
+            .sprite-img { font-size: 3rem; }
+            .character-sprite { width: 50px; height: 50px; }
+            .top-hud { top: 2px; left: 5px; right: 5px; }
+            .player-status { padding: 3px; width: 45%; }
+            .player-status span { font-size: 0.4rem !important; }
+            .hp-bar-container { height: 6px; margin-top:2px; }
+            .atp-bar-container { height: 3px; margin-top:2px; }
+            
+            #control-panel { flex: 2.5; padding: 5px; gap: 3px; border-top-width: 2px; }
+            .rpg-box { padding: 5px; }
+            #q-title { font-size: 0.5rem; margin-bottom: 3px; }
+            #q-text { font-size: 0.6rem; line-height: 1.2; }
+            .p-label { font-size: 0.4rem; margin-bottom: 1px; }
+            .btn-rpg { padding: 5px 3px; font-size: 0.5rem; }
+            .skill-btn { padding: 3px 1px; }
+            .skill-emoji { font-size: 0.7rem; margin-bottom: 0; }
+            .skill-btn span { font-size: 0.3rem; }
+            
+            /* Form & Keyboard Compact */
+            .form-container { gap: 5px; margin-bottom: 2px; }
+            .player-form { padding: 5px; }
+            .form-title { font-size: 0.5rem; margin-bottom: 2px; }
+            .input-label { font-size: 0.4rem; }
+            .rpg-input { padding: 3px; font-size: 0.5rem; }
+            
+            #virtual-keyboard { gap: 2px; padding: 3px; margin-top: 2px; }
+            .kb-key { padding: 6px 0; font-size: 0.6rem; width: 30px; } /* Tombol keyboard diperkecil sedikit agar muat */
+            .kb-key.wide { width: 60px; }
+            .kb-key.space { width: 120px; }
+            
+            .modal h1 { font-size: 1rem; margin: 2px 0; }
+            .start-btn, .leaderboard-btn, .lb-close, .settings-btn { padding: 6px 10px; font-size: 0.6rem; margin-top: 5px; min-width: 80px;}
+            .btn-row { gap: 5px; margin-top: 5px; }
         }
     </style>
 </head>
@@ -569,7 +579,7 @@
         </div>
     </div>
 
-    <!-- LEADERBOARD MODAL (UPDATED WITH FILTERS) -->
+    <!-- LEADERBOARD MODAL -->
     <div id="leaderboard-screen" class="modal" style="display: none;">
         <h1>HALL OF FAME</h1>
         
@@ -730,13 +740,19 @@
             input.value = input.value.slice(0, -1);
         }
 
-        // --- FULLSCREEN TOGGLE ---
+        // --- FULLSCREEN TOGGLE (SMART FALLBACK) ---
         function toggleFullscreen() {
+            // Cek apakah sudah fullscreen
             if (!document.fullscreenElement) {
+                // Coba minta fullscreen
                 document.documentElement.requestFullscreen().catch(err => {
-                    // console.error(`Error enabling fullscreen: ${err.message}`); // Don't log as error
-                    console.log(`Fullscreen blocked: ${err.message}`); // Log as info
-                    alert("Mode Layar Penuh tidak diizinkan di lingkungan ini (Preview/Iframe). Silakan buka di tab baru atau browser utama.");
+                    console.log(`Fullscreen blocked: ${err.message}`);
+                    
+                    // JIKA GAGAL (KARENA GOOGLE SITES/IFRAME):
+                    // Tampilkan konfirmasi untuk buka di tab baru
+                    if (confirm("Mode Layar Penuh dibatasi oleh Google Sites.\n\nIngin membuka game di Tab Baru agar bisa Fullscreen?")) {
+                        window.open(window.location.href, '_blank');
+                    }
                 });
             } else {
                 if (document.exitFullscreen) {
@@ -1303,7 +1319,7 @@
             const btnText = document.getElementById('btn-text');
             btn.disabled = false;
             spinner.style.display = 'none';
-            btnText.innerText = "MULAI GAME";
+            btnText.innerText = "▶️ MULAI GAME";
 
             document.getElementById('game-over-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
