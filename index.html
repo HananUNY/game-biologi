@@ -198,8 +198,15 @@
             text-shadow: 1px 1px 0 #000;
         }
 
+        /* Disabled State for Penalty */
+        .btn-rpg:disabled { 
+            filter: grayscale(1); 
+            cursor: not-allowed; 
+            opacity: 0.7;
+            transform: scale(0.98);
+        }
+
         .btn-rpg:active { transform: translateY(4px); border-bottom: none; }
-        .btn-rpg:disabled { filter: grayscale(1); cursor: not-allowed; }
 
         .p-label { text-align: center; font-size: 0.7rem; margin-bottom: 5px; color: #aaa; text-transform: uppercase; }
 
@@ -280,7 +287,7 @@
             z-index: 999;
             text-align: center;
             padding: 10px;
-            overflow-y: auto; /* Penting agar bisa di-scroll */
+            overflow-y: auto; 
         }
         
         .modal h1 { color: gold; font-size: 2rem; margin: 20px 0; text-shadow: 4px 4px 0 #a00; }
@@ -430,16 +437,7 @@
             #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel { display: none !important; }
         }
 
-        /* --- RESPONSIVE MOBILE LANDSCAPE --- */
         @media only screen and (max-width: 900px) and (orientation: landscape) {
-            /* Reset Modal Display */
-            .modal { 
-                justify-content: flex-start; /* Align top untuk memungkinkan scroll */
-                padding-top: 10px;
-                overflow-y: auto;
-            }
-            
-            /* Scene Area - Lebih kecil */
             #scene-area { flex: 1.5; padding: 0 10px 10px 10px; } 
             .bg-prop { font-size: 3rem; }
             .sprite-img { font-size: 3rem; }
@@ -449,8 +447,6 @@
             .player-status span { font-size: 0.4rem !important; }
             .hp-bar-container { height: 6px; margin-top:2px; }
             .atp-bar-container { height: 3px; margin-top:2px; }
-            
-            /* Control Panel - Lebih padat */
             #control-panel { flex: 2.5; padding: 5px; gap: 3px; border-top-width: 2px; }
             .rpg-box { padding: 5px; }
             #q-title { font-size: 0.5rem; margin-bottom: 3px; }
@@ -460,31 +456,21 @@
             .skill-btn { padding: 3px 1px; }
             .skill-emoji { font-size: 0.7rem; margin-bottom: 0; }
             .skill-btn span { font-size: 0.3rem; }
-            
-            /* Form & Input Compact */
             .form-container { gap: 5px; margin-bottom: 2px; }
             .player-form { padding: 5px; min-width: auto; }
             .form-title { font-size: 0.5rem; margin-bottom: 2px; }
             .input-label { font-size: 0.4rem; }
             .rpg-input { padding: 3px; font-size: 0.5rem; }
-            
-            /* Keyboard Compact */
             #virtual-keyboard { gap: 2px; padding: 3px; margin-top: 2px; }
             .kb-key { padding: 6px 0; font-size: 0.6rem; width: 30px; }
             .kb-key.wide { width: 60px; }
             .kb-key.space { width: 120px; }
-            
-            /* Button Row & Headers */
             .modal h1 { font-size: 1.2rem; margin: 5px 0; }
             .start-btn, .leaderboard-btn, .lb-close, .settings-btn { padding: 6px 10px; font-size: 0.6rem; margin-top: 5px; min-width: 80px; }
             .btn-row { gap: 5px; margin-top: 5px; }
-            
-            /* Modal Box & Content */
             .modal-box { padding: 10px; gap: 10px; }
             .tut-icon { font-size: 1.2rem; }
             .tut-row { font-size: 0.6rem; margin-bottom: 5px; }
-
-            /* Game Over Screen Specifics */
             #game-over-screen { justify-content: flex-start; padding-top: 20px; }
             .summary-container { flex-direction: row; gap: 10px; }
             .summary-col { max-height: 40vh; padding: 10px; }
@@ -1078,6 +1064,7 @@
                 if (state[player].frozen) btn.disabled = true;
                 btn.onclick = () => {
                     if (state.locked || state[player].frozen) return;
+                    if (state[player].inPenalty) return; // Anti-Spam Check
                     handleAnswer(player, opt.c, btn, qData.q);
                 };
                 container.appendChild(btn);
@@ -1105,11 +1092,34 @@
                 state[player].atp += 25;
                 setTimeout(() => { updateUI(); state.qIndex++; nextQuestion(); }, 1500);
             } else {
-                if(btn) { btn.style.backgroundColor = 'var(--btn-wrong)'; btn.disabled = true; }
+                // PENALTY LOGIC (ANTI-SPAM)
+                state[player].inPenalty = true; // Lock player
+                
+                if(btn) { 
+                    btn.style.backgroundColor = 'var(--btn-wrong)'; 
+                    // btn.disabled = true; // Don't just disable one, disable all
+                }
+
+                // Disable ALL buttons for this player
+                const allBtns = document.querySelectorAll(`#${player}-answers .btn-rpg`);
+                allBtns.forEach(b => b.disabled = true);
+                
                 state[player].streak = 0;
-                state[player].hp -= 5;
-                showDamage(player, "-5", false);
+                state[player].hp -= 10; // Increased Damage
+                showDamage(player, "-10 (PENALTY!)", false);
                 updateUI();
+                
+                // Release Penalty after 1.5s
+                setTimeout(() => {
+                    state[player].inPenalty = false;
+                    // Re-enable buttons that are NOT the clicked wrong one (optional, or keep disabled)
+                    // In this game flow, usually we wait for next question or just keep going. 
+                    // But since it's "spam click" prevention, we re-enable others after delay.
+                     allBtns.forEach(b => {
+                        if (b !== btn) b.disabled = false;
+                     });
+                }, 1500);
+
                 if (state.gameMode === 'single') {
                     if (player === 'p1') scheduleAITurn(); 
                     else if (player === 'p2') {
