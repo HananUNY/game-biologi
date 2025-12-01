@@ -33,8 +33,7 @@
             padding: 0;
             background-color: #000;
             font-family: 'Press Start 2P', cursive;
-            /* Ubah overflow jadi auto agar jika terpotong masih bisa discroll sedikit */
-            overflow: hidden; 
+            overflow: hidden;
             height: 100vh; 
             height: 100dvh; 
             width: 100vw;
@@ -43,12 +42,12 @@
             flex-direction: column;
         }
 
-        /* --- FULLSCREEN BUTTON (BARU) --- */
+        /* --- FULLSCREEN BUTTON --- */
         #fs-btn {
             position: fixed;
             top: 10px;
             right: 10px;
-            z-index: 12000; /* Di atas segalanya */
+            z-index: 12000;
             background: rgba(0, 0, 0, 0.7);
             color: var(--gold);
             border: 2px solid var(--gold);
@@ -66,18 +65,14 @@
         #scene-area {
             flex: 3;
             position: relative;
-            
-            /* BACKGROUND STRATEGY */
             background-color: #1a0f0a;
             background-image: 
                 url('https://raw.githubusercontent.com/HananUNY/simulasi-biologi/refs/heads/main/background_rpg.jpeg'),
                 repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(0,0,0,0.2) 40px, rgba(0,0,0,0.2) 42px),
                 linear-gradient(to bottom, #2c3e50 0%, #000 80%, #27ae60 80%);
-            
             background-size: cover, auto, auto; 
             background-position: center bottom, top left, top left;
             background-repeat: no-repeat, repeat, no-repeat;
-            
             overflow: hidden;
             display: flex;
             justify-content: space-between;
@@ -98,7 +93,6 @@
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        /* Boss Effect Class */
         .boss-mode {
             transform: scaleX(-1.5) scaleY(1.5) !important; 
             filter: drop-shadow(0 0 20px red) hue-rotate(-30deg);
@@ -119,7 +113,7 @@
             display: flex;
             justify-content: space-between;
             z-index: 100;
-            pointer-events: none; /* Agar klik tembus ke layer bawah jika perlu */
+            pointer-events: none;
         }
 
         .player-status {
@@ -260,7 +254,6 @@
         .shake { animation: shake 0.5s; }
         @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 100% { transform: translateX(0); } }
 
-        /* BOSS REVIVE ANIMATION */
         @keyframes bossRevive {
             0% { transform: scale(0); opacity: 0; }
             50% { transform: scale(1.5); opacity: 1; }
@@ -277,33 +270,32 @@
             white-space: nowrap;
         }
 
-        /* MODAL GENERAL */
+        /* --- MODAL GENERAL --- */
         .modal {
             position: fixed; top:0; left:0; width:100%; height:100%;
             background: rgba(0,0,0,0.95);
             display: flex; flex-direction: column;
-            justify-content: flex-start;
+            justify-content: center;
             align-items: center;
             z-index: 999;
             text-align: center;
             padding: 10px;
-            overflow-y: auto; /* Izinkan scroll jika konten terlalu panjang di HP */
+            overflow-y: auto; /* Penting agar bisa di-scroll */
         }
-        #start-screen { justify-content: center; padding-top: 2vh; }
         
-        .modal h1 { color: gold; font-size: 2rem; margin: 5px 0 10px 0; text-shadow: 4px 4px 0 #a00; }
+        .modal h1 { color: gold; font-size: 2rem; margin: 20px 0; text-shadow: 4px 4px 0 #a00; }
         
-        /* NEW BUTTON LAYOUT */
+        /* BUTTONS */
         .btn-row { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
-            gap: 10px; 
-            margin-top: 10px; 
+            gap: 15px; 
+            margin-top: 15px; 
             margin-bottom: 20px; 
             width: 100%;
             max-width: 900px;
-            flex-wrap: wrap; /* Agar tombol turun jika layar sangat sempit */
+            flex-wrap: wrap;
         }
 
         .start-btn {
@@ -311,108 +303,112 @@
             color: white; font-family: 'Press Start 2P'; font-size: 1.2rem;
             border: 4px solid #fff; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 10px;
-            min-width: 200px; /* Sedikit dikecilkan min-width agar muat */
+            min-width: 250px;
             box-shadow: 0 0 15px #00ff00;
             animation: pulse 2s infinite;
-            order: 2; /* Posisi Tengah */
         }
         .start-btn:disabled { background: #555; cursor: wait; animation: none; box-shadow: none; }
 
         .secondary-btn {
-            background: #0088cc; padding: 10px 15px;
-            color: white; font-family: 'Press Start 2P'; font-size: 0.6rem;
+            background: #0088cc; padding: 12px 20px;
+            color: white; font-family: 'Press Start 2P'; font-size: 0.7rem;
             border: 2px solid #fff; cursor: pointer;
-            min-width: 100px;
+            min-width: 120px;
             transition: transform 0.1s;
         }
         .secondary-btn:active { transform: translateY(3px); }
-        
-        .settings-btn { background: #555; color: #ccc; border-color: #999; order: 1; } /* Kiri */
-        .leaderboard-btn { background: #0088cc; border-color: #00ffff; order: 3; } /* Kanan */
+        .settings-btn { background: #555; color: #ccc; border-color: #999; }
+        .leaderboard-btn { background: #0088cc; border-color: #00ffff; }
 
-        /* INPUT FORM STYLES */
-        .form-container {
-            display: flex; justify-content: center; gap: 15px; width: 100%; max-width: 900px; margin-bottom: 5px;
+        /* UNIFIED MODAL BOX */
+        .modal-box {
+            width: 95%; 
+            max-width: 900px; 
+            background: #2e1a12; 
+            border: 4px solid #8b4513; 
+            padding: 20px; 
+            text-align: left; 
+            margin-bottom: 20px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
+
+        .form-container, .tutorial-content, .settings-content, #leaderboard-content, .summary-container {
+            width: 100%; max-width: 100%; background: transparent; border: none; padding: 0; box-shadow: none;
+            display: flex; flex-direction: column; gap: 15px;
+        }
+        .form-container { flex-direction: row; justify-content: center; gap: 30px; }
+        /* Summary specific to keep row layout on large screens */
+        .summary-container { flex-direction: row; gap: 20px; }
+
+        /* FORM */
         .player-form {
-            flex: 1; background: rgba(0,0,0,0.6); border: 2px solid #fff; padding: 8px; border-radius: 10px;
+            flex: 1; background: rgba(0,0,0,0.3); border: 2px solid #fff; padding: 15px; border-radius: 8px;
             transition: all 0.3s;
+            min-width: 300px;
         }
         .player-form.hidden { display: none; }
-        .form-title { font-size: 0.7rem; margin-bottom: 5px; text-decoration: underline; }
-        .input-group { margin-bottom: 5px; text-align: left; }
-        .input-label { font-size: 0.5rem; color: #aaa; margin-bottom: 2px; display: block; }
+        .form-title { font-size: 0.9rem; margin-bottom: 15px; text-decoration: underline; text-align: center; font-weight: bold; }
+        .input-group { margin-bottom: 10px; text-align: left; }
+        .input-label { font-size: 0.6rem; color: #aaa; margin-bottom: 4px; display: block; }
         .rpg-input {
-            width: 100%; padding: 6px; background: #222; border: 2px solid #555;
-            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.6rem; outline: none;
+            width: 100%; padding: 10px; background: #111; border: 2px solid #555;
+            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.8rem; outline: none;
         }
-        .rpg-input:focus { border-color: gold; background: #333; }
+        .rpg-input:focus { border-color: gold; background: #222; }
 
         /* MODE TOGGLE */
-        .mode-selector { display: flex; gap: 10px; margin-bottom: 10px; }
+        .mode-selector { display: flex; gap: 15px; margin-bottom: 15px; justify-content: center; }
         .mode-btn {
-            padding: 8px 15px; border: 2px solid #555; background: #222; color: #aaa;
-            font-family: 'Press Start 2P'; cursor: pointer; font-size: 0.6rem;
+            padding: 10px 20px; border: 2px solid #555; background: #222; color: #aaa;
+            font-family: 'Press Start 2P'; cursor: pointer; font-size: 0.7rem;
         }
         .mode-btn.active { border-color: gold; color: gold; background: #333; box-shadow: 0 0 10px gold; }
 
-        /* VIRTUAL KEYBOARD (BIGGER KEYS) */
+        /* KEYBOARD */
         #virtual-keyboard {
-            width: 100%; max-width: 950px; background: #2e1a12; border: 3px solid #8b4513;
-            padding: 8px; display: flex; flex-direction: column; gap: 5px; margin-top: 5px;
+            width: 100%; max-width: 900px; background: #2e1a12; border: 3px solid #8b4513;
+            padding: 10px; display: flex; flex-direction: column; gap: 5px; margin-top: 5px; align-self: center;
         }
-        .kb-row { display: flex; justify-content: center; gap: 3px; }
+        .kb-row { display: flex; justify-content: center; gap: 5px; }
         .kb-key {
-            padding: 12px 0; /* Tinggi tombol diperbesar */
-            width: 40px;     /* Lebar tombol diperbesar */
-            background: #5d4037; border: 2px solid #8b4513;
+            padding: 12px 0; width: 45px; background: #5d4037; border: 2px solid #8b4513;
             color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.9rem; 
-            cursor: pointer; box-shadow: 0 3px 0 #3e2723;
-            touch-action: manipulation; 
+            cursor: pointer; box-shadow: 0 4px 0 #3e2723; touch-action: manipulation; 
         }
         .kb-key:active { transform: translateY(3px); box-shadow: none; }
-        .kb-key.wide { width: 80px; }
+        .kb-key.wide { width: 90px; }
         .kb-key.space { width: 250px; }
 
         /* TUTORIAL & SETTINGS */
-        .tutorial-content, .settings-content {
-            width: 90%; max-width: 900px; background: #2e1a12; border: 4px solid #8b4513;
-            padding: 20px; text-align: left; margin-bottom: 20px;
-        }
-        .tut-section { margin-bottom: 20px; border-bottom: 2px dashed #555; padding-bottom: 10px; }
-        .tut-row { display: flex; align-items: center; gap: 15px; margin-bottom: 10px; font-size: 0.7rem; line-height: 1.4; }
-        .tut-icon { font-size: 2rem; width: 50px; text-align: center; }
-        .settings-content { text-align: center; }
-        .tut-code { 
-            background: #111; color: #00ff00; padding: 5px; font-family: monospace; font-size: 0.7rem; display: block; margin: 5px 0; word-break: break-all;
-        }
+        .tut-section { margin-bottom: 15px; border-bottom: 2px dashed #555; padding-bottom: 10px; }
+        .tut-row { display: flex; align-items: center; gap: 15px; margin-bottom: 8px; font-size: 0.8rem; line-height: 1.5; }
+        .tut-icon { font-size: 1.5rem; width: 40px; text-align: center; }
+        .settings-content { text-align: center; align-items: center; }
+        .tut-code { background: #111; color: #00ff00; padding: 8px; font-family: monospace; font-size: 0.7rem; display: block; margin: 10px 0; word-break: break-all; border: 1px dashed #444; }
 
         /* LEADERBOARD */
-        #leaderboard-content {
-            width: 95%; max-width: 1000px; background: #2e1a12; border: 4px solid #8b4513;
-            padding: 15px; margin-bottom: 10px;
-            display: flex; flex-direction: column; align-items: center;
-        }
-        .lb-filters { display: flex; gap: 10px; margin-bottom: 10px; width: 100%; justify-content: center; flex-wrap: wrap; }
+        .lb-filters { display: flex; gap: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
         .lb-filter-group { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
-        .lb-filter-group label { font-size: 0.5rem; color: #aaa; text-transform: uppercase; }
+        .lb-filter-group label { font-size: 0.6rem; color: #aaa; text-transform: uppercase; }
         .lb-select {
-            padding: 6px; background: #222; color: white; border: 2px solid #8b4513;
-            font-family: 'Press Start 2P', cursive; font-size: 0.5rem; cursor: pointer; min-width: 150px;
+            padding: 8px; background: #222; color: white; border: 2px solid #8b4513;
+            font-family: 'Press Start 2P', cursive; font-size: 0.7rem; cursor: pointer; min-width: 200px;
         }
         .lb-select:hover { border-color: gold; }
         .lb-table-wrapper { width: 100%; overflow-y: auto; max-height: 50vh; border: 1px solid #444; }
-        .lb-table { width: 100%; border-collapse: collapse; font-size: 0.6rem; text-align: left; }
-        .lb-table th { background: #5d4037; color: gold; padding: 10px 5px; position: sticky; top: 0; border-bottom: 2px solid #8b4513; }
-        .lb-table td { padding: 8px 5px; border-bottom: 1px dashed #555; line-height: 1.4; vertical-align: top; }
+        .lb-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; text-align: left; }
+        .lb-table th { background: #5d4037; color: gold; padding: 12px; position: sticky; top: 0; border-bottom: 2px solid #8b4513; }
+        .lb-table td { padding: 10px; border-bottom: 1px dashed #555; line-height: 1.6; vertical-align: top; }
         .lb-table tr:hover { background: rgba(255, 255, 255, 0.05); }
         .lb-close { background: #aa0000; margin-top: 10px; padding: 10px 30px; font-size: 0.8rem; border: 2px solid white; cursor: pointer; color: white; font-family: inherit; }
-        .lb-refresh { background: #00aa00; padding: 8px 15px; font-size: 0.6rem; border: 2px solid white; cursor: pointer; color: white; font-family: inherit; margin-bottom: 15px; }
-        .mode-badge { padding: 2px 4px; border-radius: 2px; font-size: 0.45rem; margin-right: 5px; border: 1px solid #555; }
-        .school-tag { color: #888; font-style: italic; font-size: 0.5rem; display: block; margin-top: 2px; }
+        .lb-refresh { background: #00aa00; padding: 8px 20px; font-size: 0.7rem; border: 2px solid white; cursor: pointer; color: white; font-family: inherit; margin-bottom: 10px; align-self: center; }
+        .mode-badge { padding: 2px 5px; border-radius: 3px; font-size: 0.5rem; margin-right: 5px; border: 1px solid #555; }
+        .school-tag { color: #888; font-style: italic; font-size: 0.6rem; display: block; margin-top: 4px; }
 
         /* SUMMARY */
-        .summary-container { display: flex; gap: 20px; width: 90%; max-width: 1000px; margin-bottom: 20px; }
         .summary-col { flex: 1; background: #2e1a12; border: 3px solid #8b4513; padding: 15px; text-align: left; max-height: 50vh; overflow-y: auto; }
         .summary-col h3 { margin-top: 0; border-bottom: 2px solid #555; padding-bottom: 10px; font-size: 1rem; }
         .q-list-item { font-size: 0.7rem; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #444; line-height: 1.4; color: #ddd; }
@@ -434,9 +430,17 @@
             #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel { display: none !important; }
         }
 
-        /* MEDIA QUERY KHUSUS UNTUK HP LANDSCAPE (Tinggi Kecil) */
+        /* --- RESPONSIVE MOBILE LANDSCAPE --- */
         @media only screen and (max-width: 900px) and (orientation: landscape) {
-            #scene-area { flex: 1; padding: 0 10px 10px 10px; } /* Scene area lebih kecil */
+            /* Reset Modal Display */
+            .modal { 
+                justify-content: flex-start; /* Align top untuk memungkinkan scroll */
+                padding-top: 10px;
+                overflow-y: auto;
+            }
+            
+            /* Scene Area - Lebih kecil */
+            #scene-area { flex: 1.5; padding: 0 10px 10px 10px; } 
             .bg-prop { font-size: 3rem; }
             .sprite-img { font-size: 3rem; }
             .character-sprite { width: 50px; height: 50px; }
@@ -446,6 +450,7 @@
             .hp-bar-container { height: 6px; margin-top:2px; }
             .atp-bar-container { height: 3px; margin-top:2px; }
             
+            /* Control Panel - Lebih padat */
             #control-panel { flex: 2.5; padding: 5px; gap: 3px; border-top-width: 2px; }
             .rpg-box { padding: 5px; }
             #q-title { font-size: 0.5rem; margin-bottom: 3px; }
@@ -456,21 +461,35 @@
             .skill-emoji { font-size: 0.7rem; margin-bottom: 0; }
             .skill-btn span { font-size: 0.3rem; }
             
-            /* Form & Keyboard Compact */
+            /* Form & Input Compact */
             .form-container { gap: 5px; margin-bottom: 2px; }
-            .player-form { padding: 5px; }
+            .player-form { padding: 5px; min-width: auto; }
             .form-title { font-size: 0.5rem; margin-bottom: 2px; }
             .input-label { font-size: 0.4rem; }
             .rpg-input { padding: 3px; font-size: 0.5rem; }
             
+            /* Keyboard Compact */
             #virtual-keyboard { gap: 2px; padding: 3px; margin-top: 2px; }
-            .kb-key { padding: 6px 0; font-size: 0.6rem; width: 30px; } /* Tombol keyboard diperkecil sedikit agar muat */
+            .kb-key { padding: 6px 0; font-size: 0.6rem; width: 30px; }
             .kb-key.wide { width: 60px; }
             .kb-key.space { width: 120px; }
             
-            .modal h1 { font-size: 1rem; margin: 2px 0; }
-            .start-btn, .leaderboard-btn, .lb-close, .settings-btn { padding: 6px 10px; font-size: 0.6rem; margin-top: 5px; min-width: 80px;}
+            /* Button Row & Headers */
+            .modal h1 { font-size: 1.2rem; margin: 5px 0; }
+            .start-btn, .leaderboard-btn, .lb-close, .settings-btn { padding: 6px 10px; font-size: 0.6rem; margin-top: 5px; min-width: 80px; }
             .btn-row { gap: 5px; margin-top: 5px; }
+            
+            /* Modal Box & Content */
+            .modal-box { padding: 10px; gap: 10px; }
+            .tut-icon { font-size: 1.2rem; }
+            .tut-row { font-size: 0.6rem; margin-bottom: 5px; }
+
+            /* Game Over Screen Specifics */
+            #game-over-screen { justify-content: flex-start; padding-top: 20px; }
+            .summary-container { flex-direction: row; gap: 10px; }
+            .summary-col { max-height: 40vh; padding: 10px; }
+            .summary-col h3 { font-size: 0.7rem; }
+            .q-list-item { font-size: 0.5rem; line-height: 1.2; }
         }
     </style>
 </head>
@@ -490,13 +509,12 @@
     <div id="start-screen" class="modal">
         <h1>BIO-WAR<br>RPG</h1>
         
-        <!-- MODE SELECTOR -->
         <div class="mode-selector">
             <button id="mode-single" class="mode-btn active" onclick="setMode('single')">1 PLAYER (Lawan AI)</button>
             <button id="mode-versus" class="mode-btn" onclick="setMode('versus')">2 PLAYER (Versus)</button>
         </div>
 
-        <div class="form-container">
+        <div class="modal-box form-container">
             <!-- P1 Input -->
             <div class="player-form" style="border-color: var(--p1-color);">
                 <div class="form-title" style="color: var(--p1-color);">PEMAIN 1 (IMUN)</div>
@@ -514,7 +532,7 @@
                 </div>
             </div>
 
-            <!-- P2 Input (Hidden in Single Player) -->
+            <!-- P2 Input -->
             <div id="p2-form" class="player-form hidden" style="border-color: var(--p2-color);">
                 <div class="form-title" style="color: var(--p2-color);">PEMAIN 2 (PATOGEN)</div>
                 <div class="input-group">
@@ -532,7 +550,6 @@
             </div>
         </div>
 
-        <!-- KEYBOARD -->
         <div id="virtual-keyboard">
             <div class="kb-row"><button class="kb-key" onclick="typeKey('1')">1</button><button class="kb-key" onclick="typeKey('2')">2</button><button class="kb-key" onclick="typeKey('3')">3</button><button class="kb-key" onclick="typeKey('4')">4</button><button class="kb-key" onclick="typeKey('5')">5</button><button class="kb-key" onclick="typeKey('6')">6</button><button class="kb-key" onclick="typeKey('7')">7</button><button class="kb-key" onclick="typeKey('8')">8</button><button class="kb-key" onclick="typeKey('9')">9</button><button class="kb-key" onclick="typeKey('0')">0</button></div>
             <div class="kb-row"><button class="kb-key" onclick="typeKey('Q')">Q</button><button class="kb-key" onclick="typeKey('W')">W</button><button class="kb-key" onclick="typeKey('E')">E</button><button class="kb-key" onclick="typeKey('R')">R</button><button class="kb-key" onclick="typeKey('T')">T</button><button class="kb-key" onclick="typeKey('Y')">Y</button><button class="kb-key" onclick="typeKey('U')">U</button><button class="kb-key" onclick="typeKey('I')">I</button><button class="kb-key" onclick="typeKey('O')">O</button><button class="kb-key" onclick="typeKey('P')">P</button></div>
@@ -551,10 +568,10 @@
         </div>
     </div>
 
-    <!-- SETTINGS SCREEN (GURU) -->
+    <!-- SETTINGS SCREEN -->
     <div id="settings-screen" class="modal" style="display: none;">
         <h1>PENGATURAN SOAL</h1>
-        <div class="settings-content">
+        <div class="modal-box settings-content">
             <p style="font-size: 0.7rem; color: #ccc; margin-bottom: 15px;">
                 Guru dapat mengganti soal dengan Google Spreadsheet sendiri.<br>
                 Pastikan Spreadsheet di-share: <b>"Anyone with the link"</b>.
@@ -582,11 +599,8 @@
     <!-- LEADERBOARD MODAL -->
     <div id="leaderboard-screen" class="modal" style="display: none;">
         <h1>HALL OF FAME</h1>
-        
-        <div id="leaderboard-content">
+        <div id="leaderboard-content" class="modal-box">
             <button class="lb-refresh" onclick="fetchLeaderboardData()">🔄 REFRESH DATA</button>
-            
-            <!-- FILTER SECTION -->
             <div class="lb-filters">
                 <div class="lb-filter-group">
                     <label>MODE PERMAINAN</label>
@@ -600,11 +614,9 @@
                     <label>ASAL SEKOLAH</label>
                     <select id="filter-school" class="lb-select" onchange="applyFilters()">
                         <option value="all">SEMUA SEKOLAH</option>
-                        <!-- Auto filled by JS -->
                     </select>
                 </div>
             </div>
-
             <div class="lb-table-wrapper">
                 <table class="lb-table">
                     <thead>
@@ -616,9 +628,7 @@
                             <th width="25%">PEMENANG</th>
                         </tr>
                     </thead>
-                    <tbody id="lb-table-body">
-                        <!-- Data will be injected here -->
-                    </tbody>
+                    <tbody id="lb-table-body"></tbody>
                 </table>
                 <div id="lb-loading" style="text-align:center; padding:20px; color:#aaa;">Sedang memuat data...</div>
             </div>
@@ -629,8 +639,7 @@
     <!-- TUTORIAL SCREEN -->
     <div id="tutorial-screen" class="modal" style="display: none;">
         <h1>TATA CARA</h1>
-        <!-- Content injected by JS -->
-        <div id="tutorial-body" class="tutorial-content"></div>
+        <div id="tutorial-body" class="modal-box tutorial-content"></div>
         <button class="start-btn" onclick="startGame()">SIAP TEMPUR!</button>
     </div>
 
@@ -638,7 +647,7 @@
     <div id="game-over-screen" class="modal" style="display: none;">
         <h1 id="winner-text">GAME OVER</h1>
         <div id="upload-status"></div>
-        <div class="summary-container">
+        <div class="modal-box summary-container">
             <div class="summary-col" style="border-color: var(--p1-color);">
                 <h3 id="p1-summary-title" style="color: var(--p1-color);">IMUN (P1)</h3>
                 <div style="margin-bottom: 10px; font-size: 0.8rem;">TOTAL BENAR: <span id="p1-score-final">0</span></div>
@@ -740,16 +749,10 @@
             input.value = input.value.slice(0, -1);
         }
 
-        // --- FULLSCREEN TOGGLE (SMART FALLBACK) ---
         function toggleFullscreen() {
-            // Cek apakah sudah fullscreen
             if (!document.fullscreenElement) {
-                // Coba minta fullscreen
                 document.documentElement.requestFullscreen().catch(err => {
                     console.log(`Fullscreen blocked: ${err.message}`);
-                    
-                    // JIKA GAGAL (KARENA GOOGLE SITES/IFRAME):
-                    // Tampilkan konfirmasi untuk buka di tab baru
                     if (confirm("Mode Layar Penuh dibatasi oleh Google Sites.\n\nIngin membuka game di Tab Baru agar bisa Fullscreen?")) {
                         window.open(window.location.href, '_blank');
                     }
@@ -780,7 +783,6 @@
             }
         }
 
-        // --- CUSTOM SHEET SETTINGS ---
         function openSettings() {
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('settings-screen').style.display = 'flex';
@@ -897,9 +899,9 @@
             const btn = document.getElementById('start-game-btn');
             const spinner = document.getElementById('btn-spinner');
             const btnText = document.getElementById('btn-text');
+            if (btnText) btnText.innerText = "MEMUAT DATA...";
             btn.disabled = true;
             spinner.style.display = 'block';
-            btnText.innerText = "MEMUAT DATA...";
 
             if (!isCustomSheet) {
                  await loadQuestionsFromSheet(); 
@@ -920,12 +922,10 @@
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('tutorial-screen').style.display = 'flex';
             
-            // DYNAMIC TUTORIAL CONTENT
             const body = document.getElementById('tutorial-body');
             let html = '';
 
             if(state.gameMode === 'single') {
-                // SINGLE PLAYER TUTORIAL
                 html = `
                     <div class="tut-section">
                         <h3 style="color: gold;">⚔️ SINGLE PLAYER (CAMPAIGN)</h3>
@@ -940,7 +940,6 @@
                     </div>
                 `;
             } else {
-                // MULTIPLAYER TUTORIAL (SPLIT)
                 html = `
                     <div class="tut-section">
                         <h3 style="color: gold;">⚔️ MULTIPLAYER (VERSUS)</h3>
@@ -970,7 +969,6 @@
             state.qIndex = 0;
             state.history = { p1: [], p2: [] };
             
-            // FIX: Reset Boss visual explicitely
             const p2Char = document.getElementById('p2-char');
             p2Char.classList.remove('boss-mode'); 
             state.bossLives = 0;
@@ -1299,7 +1297,6 @@
             if (state.typeWriterInterval) clearInterval(state.typeWriterInterval);
             state = { p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 }, p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 }, qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] }, gameMode: 'single', level: 1, aiTimer: null };
             
-            // FORCE RESET BOSS VISUAL
             const p2Char = document.getElementById('p2-char');
             p2Char.classList.remove('boss-mode');
             p2Char.style.transform = 'scaleX(-1)';
@@ -1317,9 +1314,9 @@
             const btn = document.getElementById('start-game-btn');
             const spinner = document.getElementById('btn-spinner');
             const btnText = document.getElementById('btn-text');
+            if (btnText) btnText.innerText = "▶️ MULAI GAME";
             btn.disabled = false;
             spinner.style.display = 'none';
-            btnText.innerText = "▶️ MULAI GAME";
 
             document.getElementById('game-over-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
@@ -1334,11 +1331,9 @@
             focusInput('p1-input-name');
         }
 
-        // --- LEADERBOARD LOGIC (MERGED) ---
         async function openLeaderboard() {
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('leaderboard-screen').style.display = 'flex';
-            // Panggil tanpa await karena JSONP tidak mengembalikan promise secara langsung di sini
             fetchLeaderboardData();
         }
 
@@ -1347,20 +1342,17 @@
             document.getElementById('start-screen').style.display = 'flex';
         }
 
-        // FUNGSI BARU: FETCH DATA VIA JSONP (ANTI-CORS)
         function fetchLeaderboardData() {
             const loading = document.getElementById('lb-loading');
             const tableBody = document.getElementById('lb-table-body');
             const currentID = LEADERBOARD_SHEET_ID;
             
-            // Bersihkan script lama jika ada
             const oldScript = document.getElementById('lb-loader-script');
             if (oldScript) oldScript.remove();
 
             loading.style.display = 'block';
             tableBody.innerHTML = '';
 
-            // 1. Definisikan Callback Global
             window.handleLeaderboardResponse = function(json) {
                 try {
                     const rows = json.table.rows;
@@ -1370,15 +1362,8 @@
                         return;
                     }
 
-                    // Store raw data globally for filtering
-                    // Reverse agar data terbaru (paling bawah di sheet) muncul di atas
                     allLeaderboardData = rows.slice(1).reverse().map(row => {
-                        // Helper untuk ambil nilai kolom dengan aman
-                        // v = value, f = formatted value (jika ada)
                         const getCol = (idx) => (row.c[idx] ? (row.c[idx].v || "") : "-").toString();
-                        
-                        // Mapping berdasarkan urutan doPost di Google Apps Script
-                        // 0:Timestamp, 1:Mode, 2:Pemenang, 3:NamaP1, 4:KelasP1, 5:SekolahP1, 6:SkorP1...
                         return {
                             waktu: getCol(0),
                             mode: getCol(1),
@@ -1396,20 +1381,14 @@
                     console.error(e);
                     loading.innerText = "Gagal memproses data.";
                 } finally {
-                    // Bersihkan handler setelah selesai
                     delete window.handleLeaderboardResponse;
                 }
             };
 
-            // 2. Buat Script Tag untuk Request ke Google
             const script = document.createElement('script');
             script.id = 'lb-loader-script';
             script.src = `https://docs.google.com/spreadsheets/d/${currentID}/gviz/tq?tqx=responseHandler:handleLeaderboardResponse`;
-            
-            script.onerror = function() {
-                loading.innerText = "Gagal koneksi ke Google Sheet. Cek internet.";
-            };
-
+            script.onerror = function() { loading.innerText = "Gagal koneksi ke Google Sheet. Cek internet."; };
             document.body.appendChild(script);
         }
 
@@ -1420,7 +1399,6 @@
                 if (row.p1.sekolah && row.p1.sekolah !== "-" && row.p1.sekolah !== "") schools.add(row.p1.sekolah);
                 if (row.p2.sekolah && row.p2.sekolah !== "-" && row.p2.sekolah !== "" && row.p2.sekolah !== "SYSTEM") schools.add(row.p2.sekolah);
             });
-            // Keep first option
             schoolSelect.innerHTML = '<option value="all">SEMUA SEKOLAH</option>';
             schools.forEach(sch => {
                 const opt = document.createElement('option');
@@ -1459,17 +1437,12 @@
                     winnerClass = 'win-imun';
                 }
                 
-                // Mode Badge Styling
                 let modeBadge = row.mode === 'Singleplayer' 
                     ? '<span class="mode-badge" style="border-color:cyan; color:cyan">SINGLE</span>' 
                     : '<span class="mode-badge" style="border-color:orange; color:orange">VERSUS</span>';
 
                 let dateStr = row.waktu;
-                if(dateStr.includes('Date')) {
-                    // gviz returns "Date(year, month, day...)" string sometimes
-                    // simplified display:
-                    dateStr = "Baru Saja"; 
-                } 
+                if(dateStr.includes('Date')) { dateStr = "Baru Saja"; } 
 
                 tr.innerHTML = `
                     <td>${dateStr}</td>
