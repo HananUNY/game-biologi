@@ -76,33 +76,37 @@
             overflow: hidden;
             display: flex;
             justify-content: space-between;
-            align-items: flex-end;
+            align-items: flex-end; /* PENTING: Agar kaki karakter napak tanah */
             padding: 0 50px 40px 50px;
         }
 
         .bg-prop { display: none; }
 
+        /* PERBAIKAN UKURAN KARAKTER */
         .character-sprite {
             position: relative;
-            width: 120px;
-            height: 120px;
+            width: 300px; 
+            height: 300px; 
             z-index: 10;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end; 
             transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        /* Class untuk GIF Custom */
+        .char-gif {
+            width: 100%;        
+            height: auto;       
+            max-height: 100%;   
+            image-rendering: pixelated; /* Agar pixel art tetap tajam saat diperbesar */
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
         }
 
         .boss-mode {
             transform: scaleX(-1.5) scaleY(1.5) !important; 
             filter: drop-shadow(0 0 20px red) hue-rotate(-30deg);
             margin-right: 20px; 
-        }
-
-        .sprite-img {
-            font-size: 6rem;
-            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
-            animation: idleBounce 1s infinite steps(2);
         }
 
         .top-hud {
@@ -198,15 +202,8 @@
             text-shadow: 1px 1px 0 #000;
         }
 
-        /* Disabled State for Penalty */
-        .btn-rpg:disabled { 
-            filter: grayscale(1); 
-            cursor: not-allowed; 
-            opacity: 0.7;
-            transform: scale(0.98);
-        }
-
         .btn-rpg:active { transform: translateY(4px); border-bottom: none; }
+        .btn-rpg:disabled { filter: grayscale(1); cursor: not-allowed; }
 
         .p-label { text-align: center; font-size: 0.7rem; margin-bottom: 5px; color: #aaa; text-transform: uppercase; }
 
@@ -287,7 +284,7 @@
             z-index: 999;
             text-align: center;
             padding: 10px;
-            overflow-y: auto; 
+            overflow-y: auto;
         }
         
         .modal h1 { color: gold; font-size: 2rem; margin: 20px 0; text-shadow: 4px 4px 0 #a00; }
@@ -342,6 +339,7 @@
             gap: 15px;
         }
 
+        /* Containers sharing modal-box style */
         .form-container, .tutorial-content, .settings-content, #leaderboard-content, .summary-container {
             width: 100%; max-width: 100%; background: transparent; border: none; padding: 0; box-shadow: none;
             display: flex; flex-direction: column; gap: 15px;
@@ -397,6 +395,11 @@
         .tut-code { background: #111; color: #00ff00; padding: 8px; font-family: monospace; font-size: 0.7rem; display: block; margin: 10px 0; word-break: break-all; border: 1px dashed #444; }
 
         /* LEADERBOARD */
+        #leaderboard-content {
+            width: 95%; max-width: 1000px; background: #2e1a12; border: 4px solid #8b4513;
+            padding: 15px; margin-bottom: 10px;
+            display: flex; flex-direction: column; align-items: center;
+        }
         .lb-filters { display: flex; gap: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
         .lb-filter-group { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
         .lb-filter-group label { font-size: 0.6rem; color: #aaa; text-transform: uppercase; }
@@ -440,8 +443,13 @@
         @media only screen and (max-width: 900px) and (orientation: landscape) {
             #scene-area { flex: 1.5; padding: 0 10px 10px 10px; } 
             .bg-prop { font-size: 3rem; }
-            .sprite-img { font-size: 3rem; }
-            .character-sprite { width: 50px; height: 50px; }
+            
+            /* ADJUST CHARACTER SIZE IN MOBILE */
+            .character-sprite { width: 130px; height: 130px; }
+            .char-gif { /* Reset scale issues in mobile */
+                max-height: 130px;
+            }
+            
             .top-hud { top: 2px; left: 5px; right: 5px; }
             .player-status { padding: 3px; width: 45%; }
             .player-status span { font-size: 0.4rem !important; }
@@ -672,8 +680,14 @@
                 <div style="font-size: 0.6rem; color: #aaa; margin-top: 2px;">STREAK: <span id="p2-streak" style="color: gold;">0</span></div>
             </div>
         </div>
-        <div id="p1-char" class="character-sprite"><div class="sprite-img">👮</div></div>
-        <div id="p2-char" class="character-sprite" style="transform: scaleX(-1);"><div class="sprite-img">👾</div></div>
+        <div id="p1-char" class="character-sprite">
+            <!-- IMMUNE SYSTEM ASSET -->
+            <img src="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif" alt="P1" class="char-gif" id="p1-img">
+        </div>
+        <div id="p2-char" class="character-sprite" style="transform: scaleX(-1);">
+            <!-- BACTERIA ASSET (DEFAULT) -->
+            <img src="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif" alt="P2" class="char-gif" id="p2-img">
+        </div>
     </div>
 
     <div id="control-panel">
@@ -955,9 +969,13 @@
             state.qIndex = 0;
             state.history = { p1: [], p2: [] };
             
+            // RESET IMAGES & VISUALS
+            const p2Img = document.getElementById('p2-img');
             const p2Char = document.getElementById('p2-char');
-            p2Char.classList.remove('boss-mode'); 
+            
+            p2Char.classList.remove('boss-mode');
             state.bossLives = 0;
+            p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
 
             if(state.gameMode === 'single') {
                 let enemyName = `PATOGEN LV.${state.level}`;
@@ -966,9 +984,12 @@
                 document.getElementById('p2-hud-name').innerText = enemyName;
                 document.getElementById('p2-panel-name').innerText = enemyName; 
                 
+                // BOSS LEVEL LOGIC (LEVEL 5)
                 if (state.level === 5) {
-                    state.bossLives = 1; 
+                    state.bossLives = 1; // 2 Lives Total
                     p2Char.classList.add('boss-mode'); 
+                    p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria_superbug.gif";
+                    
                     if(!document.getElementById('revive-fx')) {
                         const fx = document.createElement('div');
                         fx.id = 'revive-fx';
@@ -1092,29 +1113,20 @@
                 state[player].atp += 25;
                 setTimeout(() => { updateUI(); state.qIndex++; nextQuestion(); }, 1500);
             } else {
-                // PENALTY LOGIC (ANTI-SPAM)
-                state[player].inPenalty = true; // Lock player
-                
+                state[player].inPenalty = true; 
                 if(btn) { 
                     btn.style.backgroundColor = 'var(--btn-wrong)'; 
-                    // btn.disabled = true; // Don't just disable one, disable all
                 }
-
-                // Disable ALL buttons for this player
                 const allBtns = document.querySelectorAll(`#${player}-answers .btn-rpg`);
                 allBtns.forEach(b => b.disabled = true);
                 
                 state[player].streak = 0;
-                state[player].hp -= 10; // Increased Damage
+                state[player].hp -= 10; 
                 showDamage(player, "-10 (PENALTY!)", false);
                 updateUI();
                 
-                // Release Penalty after 1.5s
                 setTimeout(() => {
                     state[player].inPenalty = false;
-                    // Re-enable buttons that are NOT the clicked wrong one (optional, or keep disabled)
-                    // In this game flow, usually we wait for next question or just keep going. 
-                    // But since it's "spam click" prevention, we re-enable others after delay.
                      allBtns.forEach(b => {
                         if (b !== btn) b.disabled = false;
                      });
@@ -1307,10 +1319,14 @@
             if (state.typeWriterInterval) clearInterval(state.typeWriterInterval);
             state = { p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 }, p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 }, qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] }, gameMode: 'single', level: 1, aiTimer: null };
             
+            // FORCE RESET BOSS VISUAL
             const p2Char = document.getElementById('p2-char');
             p2Char.classList.remove('boss-mode');
             p2Char.style.transform = 'scaleX(-1)';
             document.getElementById('p1-char').style.transform = 'none';
+
+            // RESET IMAGES TO DEFAULT
+            document.getElementById('p2-img').src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
 
             document.getElementById('p1-input-name').value = "";
             document.getElementById('p1-input-class').value = "";
