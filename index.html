@@ -102,8 +102,6 @@
             transition: filter 0.1s; 
         }
 
-        /* EFEK MERAH (DAMAGE FLASH) - UPDATED */
-        /* Menggunakan grayscale dulu lalu sepia dan hue-rotate untuk memaksa warna merah */
         .damage-flash {
             filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(2) !important;
         }
@@ -112,6 +110,12 @@
             transform: scaleX(-1.5) scaleY(1.5) !important; 
             filter: drop-shadow(0 0 20px red) hue-rotate(-30deg);
             margin-right: 20px; 
+        }
+
+        .sprite-img {
+            font-size: 6rem;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
+            animation: idleBounce 1s infinite steps(2);
         }
 
         .top-hud {
@@ -208,7 +212,7 @@
         }
 
         .btn-rpg:active { transform: translateY(4px); border-bottom: none; }
-        .btn-rpg:disabled { filter: grayscale(1); cursor: not-allowed; }
+        .btn-rpg:disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.7; transform: scale(0.98); }
 
         .p-label { text-align: center; font-size: 0.7rem; margin-bottom: 5px; color: #aaa; text-transform: uppercase; }
 
@@ -292,16 +296,16 @@
             overflow-y: auto;
         }
         
-        .modal h1 { color: gold; font-size: 2rem; margin: 20px 0; text-shadow: 4px 4px 0 #a00; }
+        .modal h1 { color: gold; font-size: 2rem; margin: 10px 0; text-shadow: 4px 4px 0 #a00; }
         
-        /* BUTTONS */
+        /* BUTTON LAYOUT UPDATE */
         .btn-row { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             gap: 15px; 
             margin-top: 15px; 
-            margin-bottom: 20px; 
+            margin-bottom: 10px; 
             width: 100%;
             max-width: 900px;
             flex-wrap: wrap;
@@ -315,6 +319,7 @@
             min-width: 250px;
             box-shadow: 0 0 15px #00ff00;
             animation: pulse 2s infinite;
+            order: 2; /* MIDDLE */
         }
         .start-btn:disabled { background: #555; cursor: wait; animation: none; box-shadow: none; }
 
@@ -326,8 +331,9 @@
             transition: transform 0.1s;
         }
         .secondary-btn:active { transform: translateY(3px); }
-        .settings-btn { background: #555; color: #ccc; border-color: #999; }
-        .leaderboard-btn { background: #0088cc; border-color: #00ffff; }
+        
+        .settings-btn { background: #555; color: #ccc; border-color: #999; order: 1; /* LEFT */ } 
+        .leaderboard-btn { background: #0088cc; border-color: #00ffff; order: 3; /* RIGHT */ }
 
         /* UNIFIED MODAL BOX */
         .modal-box {
@@ -377,20 +383,22 @@
         }
         .mode-btn.active { border-color: gold; color: gold; background: #333; box-shadow: 0 0 10px gold; }
 
-        /* KEYBOARD */
+        /* KEYBOARD (INCREASED SIZE) */
         #virtual-keyboard {
-            width: 100%; max-width: 900px; background: #2e1a12; border: 3px solid #8b4513;
-            padding: 10px; display: flex; flex-direction: column; gap: 5px; margin-top: 5px; align-self: center;
+            width: 100%; max-width: 950px; background: #2e1a12; border: 3px solid #8b4513;
+            padding: 10px; display: flex; flex-direction: column; gap: 6px; margin-top: 5px; align-self: center;
         }
         .kb-row { display: flex; justify-content: center; gap: 5px; }
         .kb-key {
-            padding: 12px 0; width: 45px; background: #5d4037; border: 2px solid #8b4513;
-            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.9rem; 
+            padding: 15px 0; 
+            width: 50px; /* Increased */
+            background: #5d4037; border: 2px solid #8b4513;
+            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 1rem; 
             cursor: pointer; box-shadow: 0 4px 0 #3e2723; touch-action: manipulation; 
         }
         .kb-key:active { transform: translateY(3px); box-shadow: none; }
         .kb-key.wide { width: 90px; }
-        .kb-key.space { width: 250px; }
+        .kb-key.space { width: 300px; }
 
         /* TUTORIAL & SETTINGS */
         .tut-section { margin-bottom: 15px; border-bottom: 2px dashed #555; padding-bottom: 10px; }
@@ -445,14 +453,11 @@
             #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel { display: none !important; }
         }
 
+        /* RESPONSIVE MOBILE LANDSCAPE */
         @media only screen and (max-width: 900px) and (orientation: landscape) {
             #scene-area { flex: 1.5; padding: 0 10px 10px 10px; } 
-            .bg-prop { font-size: 3rem; }
-            
-            /* ADJUST CHARACTER SIZE IN MOBILE */
             .character-sprite { width: 130px; height: 130px; }
             .char-gif { max-height: 130px; }
-            
             .top-hud { top: 2px; left: 5px; right: 5px; }
             .player-status { padding: 3px; width: 45%; }
             .player-status span { font-size: 0.4rem !important; }
@@ -472,13 +477,19 @@
             .form-title { font-size: 0.5rem; margin-bottom: 2px; }
             .input-label { font-size: 0.4rem; }
             .rpg-input { padding: 3px; font-size: 0.5rem; }
+            
             #virtual-keyboard { gap: 2px; padding: 3px; margin-top: 2px; }
             .kb-key { padding: 6px 0; font-size: 0.6rem; width: 30px; }
             .kb-key.wide { width: 60px; }
             .kb-key.space { width: 120px; }
+            
             .modal h1 { font-size: 1.2rem; margin: 5px 0; }
-            .start-btn, .leaderboard-btn, .lb-close, .settings-btn { padding: 6px 10px; font-size: 0.6rem; margin-top: 5px; min-width: 80px; }
+            
+            /* Compact Buttons for Mobile */
             .btn-row { gap: 5px; margin-top: 5px; }
+            .start-btn { padding: 6px 15px; font-size: 0.8rem; margin-top: 5px; min-width: 120px; }
+            .secondary-btn { padding: 6px 10px; font-size: 0.6rem; margin-top: 5px; min-width: 60px; }
+            
             .modal-box { padding: 10px; gap: 10px; }
             .tut-icon { font-size: 1.2rem; }
             .tut-row { font-size: 0.6rem; margin-bottom: 5px; }
@@ -732,7 +743,7 @@
             p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 },
             p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 },
             qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] },
-            gameMode: 'single', level: 1, aiTimer: null, bossLives: 0
+            gameMode: 'single', level: 1, aiTimer: null, bossLives: 0, wrongAttempts: 0
         };
 
         let activeInputId = "p1-input-name";
@@ -858,22 +869,37 @@
             });
         }
 
+        function getCategory(diffString) {
+            if (!diffString) return 'easy';
+            const s = diffString.toLowerCase();
+            if (s.includes('c1') || s.includes('c2') || s.includes('mudah') || s.includes('easy') || s.includes('ingat') || s.includes('paham')) return 'easy';
+            if (s.includes('c3') || s.includes('c4') || s.includes('sedang') || s.includes('medium') || s.includes('terap') || s.includes('analisis')) return 'medium';
+            if (s.includes('c5') || s.includes('c6') || s.includes('sulit') || s.includes('sukar') || s.includes('hard') || s.includes('evaluasi') || s.includes('cipta')) return 'hard';
+            return 'easy'; 
+        }
+
         function prepareQuestionDeck() {
             let deck = [];
-            const getByDiff = (diff) => FULL_QUESTION_DATABASE.filter(q => q.difficulty.includes(diff));
             const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
             const pick = (arr, count) => shuffle(arr).slice(0, count);
 
             if (state.gameMode === 'single') {
-                if (state.level <= 2) deck = getByDiff('mudah');
-                else if (state.level <= 4) deck = getByDiff('sedang');
-                else deck = getByDiff('sulit');
+                if (state.level <= 2) {
+                    deck = FULL_QUESTION_DATABASE.filter(q => getCategory(q.difficulty) === 'easy');
+                } else if (state.level <= 4) {
+                    deck = FULL_QUESTION_DATABASE.filter(q => getCategory(q.difficulty) === 'medium');
+                } else {
+                    deck = FULL_QUESTION_DATABASE.filter(q => getCategory(q.difficulty) === 'hard');
+                }
+                
                 if (deck.length === 0) deck = FULL_QUESTION_DATABASE;
                 state.questions = shuffle(deck);
+
             } else {
-                const qEasy = getByDiff('mudah');
-                const qMed = getByDiff('sedang');
-                const qHard = getByDiff('sulit');
+                const qEasy = FULL_QUESTION_DATABASE.filter(q => getCategory(q.difficulty) === 'easy');
+                const qMed = FULL_QUESTION_DATABASE.filter(q => getCategory(q.difficulty) === 'medium');
+                const qHard = FULL_QUESTION_DATABASE.filter(q => getCategory(q.difficulty) === 'hard');
+
                 deck = [...pick(qEasy, 6), ...pick(qMed, 8), ...pick(qHard, 6)];
                 if (deck.length < 10) deck = FULL_QUESTION_DATABASE;
                 state.questions = shuffle(deck);
@@ -935,6 +961,7 @@
                         <div class="tut-row"><span class="tut-icon">⚡</span><div>JAWAB BENAR & CEPAT untuk MENYERANG.<br>Jawaban SALAH mengurangi HP sendiri!</div></div>
                         <div class="tut-row"><span class="tut-icon">🤖</span><div>Lawan AI akan semakin PINTAR & CEPAT di setiap LEVEL (Max Lv.5).</div></div>
                         <div class="tut-row"><span class="tut-icon" style="color: red; font-weight: bold;">3x</span><div>STREAK: Jawab 3x Benar Berturut-turut = <span style="color: red; font-weight: bold;">CRITICAL HIT!</span></div></div>
+                        <div class="tut-row"><span class="tut-icon" style="color: yellow;">⚠️</span><div>Soal Hangus: Jika salah 2x di Level 4-5, soal dilewati!</div></div>
                     </div>
                     <div class="tut-section">
                         <h3 style="color: var(--p1-color);">🛡️ SKILL (PEMAIN)</h3>
@@ -981,9 +1008,6 @@
             state.bossLives = 0;
             p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
             
-            // Animation Logic for Player 1 Attack (GIF Swap)
-            // We need to make sure P1 attack logic can access this later
-
             if(state.gameMode === 'single') {
                 let enemyName = `PATOGEN LV.${state.level}`;
                 state.p2.name = enemyName;
@@ -1011,6 +1035,10 @@
         }
 
         function nextQuestion() {
+            state.wrongAttempts = 0; 
+            state.locked = false;
+            state.p1.inPenalty = false; 
+
             if (state.p1.hp <= 0 || state.p2.hp <= 0) {
                 if (state.gameMode === 'single' && state.level === 5 && state.p2.hp <= 0 && state.bossLives > 0) {
                     triggerBossRevive();
@@ -1019,7 +1047,6 @@
                 return gameOver();
             }
 
-            state.locked = false;
             if (state.gameMode === 'single') scheduleAITurn();
 
             if (state.qIndex >= state.questions.length) {
@@ -1132,12 +1159,33 @@
                 showDamage(player, "-10 (PENALTY!)", false);
                 updateUI();
                 
-                setTimeout(() => {
+                // Anti-Spam Delay Reset
+                 setTimeout(() => {
                     state[player].inPenalty = false;
                      allBtns.forEach(b => {
                         if (b !== btn) b.disabled = false;
                      });
                 }, 1500);
+
+                // Skip Logic Lvl 4-5
+                if (state.gameMode === 'single' && state.level >= 4 && player === 'p1') {
+                    state.wrongAttempts++;
+                    if (state.wrongAttempts >= 2) {
+                         showDamage(player, "SOAL HANGUS!", false); 
+                         state.locked = true;
+                         setTimeout(() => {
+                             state.qIndex++;
+                             // Reset penalty explicitly before next question
+                             state[player].inPenalty = false; 
+                             if (state.qIndex >= state.questions.length) {
+                                 prepareQuestionDeck();
+                                 state.qIndex = 0;
+                             }
+                             nextQuestion();
+                         }, 1500);
+                         return; 
+                    }
+                }
 
                 if (state.gameMode === 'single') {
                     if (player === 'p1') scheduleAITurn(); 
@@ -1169,9 +1217,7 @@
             }
 
             const moveVal = attacker === 'p1' ? '50px' : '-50px';
-            
             char1.style.transform = `translateX(${moveVal}) ${attacker === 'p2' ? 'scaleX(-1)' : ''}`;
-            
             setTimeout(() => {
                 let damageText = isCrit ? "CRITICAL! -30" : "-15";
                 showDamage(defender, damageText, isCrit);
@@ -1349,7 +1395,7 @@
         function resetGame() {
             if (state.aiTimer) clearTimeout(state.aiTimer);
             if (state.typeWriterInterval) clearInterval(state.typeWriterInterval);
-            state = { p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 }, p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 }, qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] }, gameMode: 'single', level: 1, aiTimer: null };
+            state = { p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 }, p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 }, qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] }, gameMode: 'single', level: 1, aiTimer: null, bossLives: 0, wrongAttempts: 0 };
             
             // FORCE RESET BOSS VISUAL (FIXED NULL ERROR)
             const p2Char = document.getElementById('p2-char');
@@ -1360,9 +1406,9 @@
             
             const p1Char = document.getElementById('p1-char');
             if (p1Char) {
-                // Find child if p1-char is wrapper, or style directly
-                const sprite = p1Char.querySelector('.character-sprite') || p1Char;
-                if (sprite && sprite.style) sprite.style.transform = 'none';
+                // Ensure we target the wrapper correctly
+                // Previous fix tried to find .character-sprite inside #p1-char, but #p1-char IS the wrapper
+                p1Char.style.transform = 'none';
             }
 
             // RESET IMAGES TO DEFAULT
