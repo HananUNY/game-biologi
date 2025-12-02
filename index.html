@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIO-WAR: RPG Edition (Ver.8)</title>
+    <title>BIO-WAR: RPG Version 8</title>
     <link rel="preload" as="image" href="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/background_title%20and%20menu_web.png">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
@@ -425,6 +425,27 @@
             display: flex; flex-direction: column; gap: 15px;
         }
 
+        /* ABOUT BOX CONTENT */
+        .about-content {
+            text-align: left;
+            font-size: 0.7rem;
+            line-height: 1.6;
+            color: #ddd;
+        }
+        .about-section-title {
+            color: gold;
+            margin-top: 15px;
+            margin-bottom: 5px;
+            font-size: 0.8rem;
+            text-decoration: underline;
+        }
+        .about-link {
+            color: #00ffff;
+            text-decoration: none;
+            word-break: break-all;
+        }
+        .about-link:hover { text-decoration: underline; }
+
         /* Containers sharing modal-box style */
         .form-container, .tutorial-content, .settings-content, #leaderboard-content, .summary-container {
             width: 100%; max-width: 100%; background: transparent; border: none; padding: 0; box-shadow: none;
@@ -521,7 +542,7 @@
 
         @media only screen and (orientation: portrait) {
             #rotate-warning { display: flex; }
-            #title-screen, #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel, #menu-btn { display: none !important; }
+            #title-screen, #about-screen, #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel, #menu-btn { display: none !important; }
         }
 
         /* RESPONSIVE MOBILE LANDSCAPE */
@@ -604,8 +625,31 @@
             <button class="big-menu-btn" onclick="showLoginScreen()">▶️ MASUK GAME</button>
             <button class="small-menu-btn" onclick="openSettings()">⚙️ PENGATURAN SOAL</button>
             <button class="small-menu-btn" style="background:#0066cc;" onclick="openLeaderboard()">🏆 SKOR (LEADERBOARD)</button>
+            <button class="small-menu-btn" style="background:#8b4513; border-color:#d7ccc8;" onclick="openAbout()">ℹ️ TENTANG (ABOUT)</button>
         </div>
         <div class="title-footer">Dikembangkan oleh Tim SMA Negeri 1 Bantul</div>
+    </div>
+
+    <!-- ABOUT SCREEN -->
+    <div id="about-screen" class="modal" style="display: none;">
+        <h1>TENTANG</h1>
+        <div class="modal-box about-content">
+            <div class="about-section-title">INFO GAME</div>
+            <div>Versi: v8.00 (RPG Edition)</div>
+            <div>Tanggal Diupdate: 02 Desember 2025</div>
+            <div>Pengembang: Tim SMA Negeri 1 Bantul</div>
+
+            <div class="about-section-title">ATRIBUSI ASET</div>
+            <ul>
+                <li>Background: Generated AI (Gemini Nano Banana)</li>
+                <li>Karakter Imun: <a href="https://craftpix.net/freebies/free-pixel-art-tiny-hero-sprites/?utm_campaign=Website&utm_source=itch.io&utm_medium=public" target="_blank" class="about-link">Free Pixel Art Tiny Hero Sprites (Craftpix)</a></li>
+                <li>Karakter Bakteri: <a href="https://lin-ain.itch.io/slime" target="_blank" class="about-link">Slime (Lin-Ain @ itch.io)</a></li>
+            </ul>
+
+            <div class="about-section-title">KONTAK</div>
+            <div>Request Code: <a href="mailto:hanan.dimas44@gmail.com" class="about-link">hanan.dimas44@gmail.com</a></div>
+        </div>
+        <button class="secondary-btn" style="margin-top:15px; padding:15px 30px;" onclick="closeAbout()">🔙 KEMBALI</button>
     </div>
 
     <!-- START SCREEN (LOGIN / INPUT FORM) -->
@@ -897,6 +941,16 @@
 
         function backToTitle() {
             document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('title-screen').style.display = 'flex';
+        }
+
+        function openAbout() {
+            document.getElementById('title-screen').style.display = 'none';
+            document.getElementById('about-screen').style.display = 'flex';
+        }
+
+        function closeAbout() {
+            document.getElementById('about-screen').style.display = 'none';
             document.getElementById('title-screen').style.display = 'flex';
         }
 
