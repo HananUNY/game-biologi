@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIO-WAR: RPG Version 8</title>
-    <link rel="preload" as="image" href="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/background_title%20and%20menu_web.png">
+    <title>BIO-WAR: RPG Edition (Loading Added)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -43,8 +42,53 @@
             flex-direction: column;
         }
 
-        /* --- BACKGROUND MENU CLASS (FIXED) --- */
-        /* Ditambahkan !important untuk menimpa background milik class .modal */
+        /* --- LOADING OVERLAY --- */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 20000; /* Paling atas */
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .loading-title {
+            color: var(--gold);
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            text-shadow: 4px 4px 0 #a00;
+            animation: pulse 1.5s infinite;
+        }
+
+        .loading-bar-container {
+            width: 80%;
+            max-width: 400px;
+            height: 20px;
+            border: 2px solid #fff;
+            background: #222;
+            margin-bottom: 10px;
+            position: relative;
+        }
+
+        .loading-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--btn-correct);
+            transition: width 0.2s;
+        }
+
+        #loading-text {
+            color: #aaa;
+            font-size: 0.7rem;
+        }
+
+        /* --- BACKGROUND MENU CLASS --- */
         .menu-bg-style {
             background: 
                 linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
@@ -542,7 +586,7 @@
 
         @media only screen and (orientation: portrait) {
             #rotate-warning { display: flex; }
-            #title-screen, #about-screen, #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel, #menu-btn { display: none !important; }
+            #loading-overlay, #title-screen, #about-screen, #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel, #menu-btn { display: none !important; }
         }
 
         /* RESPONSIVE MOBILE LANDSCAPE */
@@ -598,6 +642,15 @@
 </head>
 <body>
 
+    <!-- LOADING OVERLAY -->
+    <div id="loading-overlay">
+        <div class="loading-title">BIO-WAR RPG</div>
+        <div class="loading-bar-container">
+            <div id="loading-bar-fill" class="loading-bar-fill"></div>
+        </div>
+        <div id="loading-text">MEMUAT ASET... 0%</div>
+    </div>
+
     <!-- PAUSE MENU BUTTON (TOP CENTER) -->
     <button id="menu-btn" onclick="togglePauseMenu()">MENU ⏸️</button>
 
@@ -635,8 +688,8 @@
         <h1>TENTANG</h1>
         <div class="modal-box about-content">
             <div class="about-section-title">INFO GAME</div>
-            <div>Versi: v8.00 (RPG Edition)</div>
-            <div>Tanggal Diupdate: 02 Desember 2025</div>
+            <div>Versi: v7.65 (RPG Edition)</div>
+            <div>Tanggal Diupdate: Desember 2025</div>
             <div>Pengembang: Tim SMA Negeri 1 Bantul</div>
 
             <div class="about-section-title">ATRIBUSI ASET</div>
@@ -876,6 +929,44 @@
 
         let FULL_QUESTION_DATABASE = []; 
         let allLeaderboardData = []; 
+
+        // --- ASSET PRELOADING ---
+        const assetsToLoad = [
+            "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/background_title%20and%20menu_web.png",
+            "https://raw.githubusercontent.com/HananUNY/simulasi-biologi/refs/heads/main/background_rpg.jpeg",
+            "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif",
+            "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif",
+            "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria_superbug.gif",
+            "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune_attack.gif"
+        ];
+
+        function preloadImages() {
+            let loaded = 0;
+            const total = assetsToLoad.length;
+            const text = document.getElementById('loading-text');
+            const bar = document.getElementById('loading-bar-fill');
+            
+            const loadImg = (src) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        loaded++;
+                        const percent = Math.floor((loaded/total)*100);
+                        if(text) text.innerText = `MEMUAT ASET... ${percent}%`;
+                        if(bar) bar.style.width = `${percent}%`;
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        console.warn("Gagal memuat:", src);
+                        loaded++; // Tetap lanjut meski error
+                        resolve(); 
+                    };
+                    img.src = src;
+                });
+            };
+
+            return Promise.all(assetsToLoad.map(loadImg));
+        }
 
         let state = {
             p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 },
@@ -1741,9 +1832,19 @@
             });
         }
 
+        // --- GAME STARTUP ---
         setMode('single'); 
-        window.onload = () => {
-             // NO OP (handled by initial HTML state)
+        
+        window.onload = async () => {
+            // Wait for assets to load
+            await preloadImages();
+            
+            // Fade out loading screen
+            const overlay = document.getElementById('loading-overlay');
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.style.display = 'none';
+            }, 500);
         };
 
     </script>
