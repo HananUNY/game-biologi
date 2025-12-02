@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIO-WAR: RPG Edition (Full Integrated)</title>
+    <title>BIO-WAR: RPG Edition (Fixed UI)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -42,24 +42,25 @@
             flex-direction: column;
         }
 
-        /* --- FULLSCREEN BUTTON --- */
-        #fs-btn {
+        /* --- PAUSE MENU BUTTON (REPLACES OLD GROUP) --- */
+        #menu-btn {
             position: fixed;
-            top: 10px;
-            right: 10px;
+            top: 5px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 12000;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             color: var(--gold);
             border: 2px solid var(--gold);
-            padding: 8px 12px;
+            padding: 8px 15px;
             font-family: 'Press Start 2P', cursive;
-            font-size: 0.6rem;
+            font-size: 0.7rem;
             cursor: pointer;
             border-radius: 5px;
-            transition: all 0.2s;
-            box-shadow: 0 0 5px rgba(0,0,0,0.5);
+            display: none; /* Hidden on start screen */
+            box-shadow: 0 0 5px #000;
         }
-        #fs-btn:hover { background: var(--gold); color: #000; }
+        #menu-btn:hover { background: var(--gold); color: #000; }
 
         /* --- SCENE AREA --- */
         #scene-area {
@@ -112,15 +113,9 @@
             margin-right: 20px; 
         }
 
-        .sprite-img {
-            font-size: 6rem;
-            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
-            animation: idleBounce 1s infinite steps(2);
-        }
-
         .top-hud {
             position: absolute;
-            top: 20px;
+            top: 15px;
             left: 20px;
             right: 20px;
             display: flex;
@@ -129,8 +124,14 @@
             pointer-events: none;
         }
 
+        .center-hud {
+            text-align: center;
+            margin-top: 40px; /* Pushed down to avoid Menu Button overlap */
+            pointer-events: none;
+        }
+
         .player-status {
-            width: 45%;
+            width: 38%; 
             background: rgba(0,0,0,0.7);
             border: 4px solid #fff;
             padding: 10px;
@@ -216,7 +217,6 @@
 
         .p-label { text-align: center; font-size: 0.7rem; margin-bottom: 5px; color: #aaa; text-transform: uppercase; }
 
-        /* Skill Buttons */
         .skill-row { display: flex; gap: 5px; margin-bottom: 5px; }
         
         .skill-btn {
@@ -296,16 +296,16 @@
             overflow-y: auto;
         }
         
-        .modal h1 { color: gold; font-size: 2rem; margin: 10px 0; text-shadow: 4px 4px 0 #a00; }
+        .modal h1 { color: gold; font-size: 2rem; margin: 20px 0; text-shadow: 4px 4px 0 #a00; }
         
-        /* BUTTON LAYOUT UPDATE */
+        /* BUTTONS */
         .btn-row { 
             display: flex; 
             justify-content: center; 
             align-items: center; 
             gap: 15px; 
             margin-top: 15px; 
-            margin-bottom: 10px; 
+            margin-bottom: 20px; 
             width: 100%;
             max-width: 900px;
             flex-wrap: wrap;
@@ -319,7 +319,7 @@
             min-width: 250px;
             box-shadow: 0 0 15px #00ff00;
             animation: pulse 2s infinite;
-            order: 2; /* MIDDLE */
+            order: 2; 
         }
         .start-btn:disabled { background: #555; cursor: wait; animation: none; box-shadow: none; }
 
@@ -331,23 +331,24 @@
             transition: transform 0.1s;
         }
         .secondary-btn:active { transform: translateY(3px); }
+        .settings-btn { background: #555; color: #ccc; border-color: #999; order: 1; }
+        .leaderboard-btn { background: #0088cc; border-color: #00ffff; order: 3; }
         
-        .settings-btn { background: #555; color: #ccc; border-color: #999; order: 1; /* LEFT */ } 
-        .leaderboard-btn { background: #0088cc; border-color: #00ffff; order: 3; /* RIGHT */ }
+        /* PAUSE MENU BTNS */
+        .pause-menu-btn {
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 10px;
+            padding: 15px;
+            font-size: 1rem;
+        }
 
-        /* UNIFIED MODAL BOX */
+        /* MODAL BOX */
         .modal-box {
-            width: 95%; 
-            max-width: 900px; 
-            background: #2e1a12; 
-            border: 4px solid #8b4513; 
-            padding: 20px; 
-            text-align: left; 
-            margin-bottom: 20px;
+            width: 95%; max-width: 900px; background: #2e1a12; border: 4px solid #8b4513; 
+            padding: 20px; text-align: left; margin-bottom: 20px;
             box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            display: flex; flex-direction: column; gap: 15px;
         }
 
         /* Containers sharing modal-box style */
@@ -356,14 +357,12 @@
             display: flex; flex-direction: column; gap: 15px;
         }
         .form-container { flex-direction: row; justify-content: center; gap: 30px; }
-        /* Summary specific to keep row layout on large screens */
         .summary-container { flex-direction: row; gap: 20px; }
 
         /* FORM */
         .player-form {
             flex: 1; background: rgba(0,0,0,0.3); border: 2px solid #fff; padding: 15px; border-radius: 8px;
-            transition: all 0.3s;
-            min-width: 300px;
+            transition: all 0.3s; min-width: 300px;
         }
         .player-form.hidden { display: none; }
         .form-title { font-size: 0.9rem; margin-bottom: 15px; text-decoration: underline; text-align: center; font-weight: bold; }
@@ -383,22 +382,20 @@
         }
         .mode-btn.active { border-color: gold; color: gold; background: #333; box-shadow: 0 0 10px gold; }
 
-        /* KEYBOARD (INCREASED SIZE) */
+        /* KEYBOARD */
         #virtual-keyboard {
-            width: 100%; max-width: 950px; background: #2e1a12; border: 3px solid #8b4513;
-            padding: 10px; display: flex; flex-direction: column; gap: 6px; margin-top: 5px; align-self: center;
+            width: 100%; max-width: 900px; background: #2e1a12; border: 3px solid #8b4513;
+            padding: 10px; display: flex; flex-direction: column; gap: 5px; margin-top: 5px; align-self: center;
         }
         .kb-row { display: flex; justify-content: center; gap: 5px; }
         .kb-key {
-            padding: 15px 0; 
-            width: 50px; /* Increased */
-            background: #5d4037; border: 2px solid #8b4513;
-            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 1rem; 
+            padding: 12px 0; width: 45px; background: #5d4037; border: 2px solid #8b4513;
+            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.9rem; 
             cursor: pointer; box-shadow: 0 4px 0 #3e2723; touch-action: manipulation; 
         }
         .kb-key:active { transform: translateY(3px); box-shadow: none; }
         .kb-key.wide { width: 90px; }
-        .kb-key.space { width: 300px; }
+        .kb-key.space { width: 250px; }
 
         /* TUTORIAL & SETTINGS */
         .tut-section { margin-bottom: 15px; border-bottom: 2px dashed #555; padding-bottom: 10px; }
@@ -450,7 +447,7 @@
 
         @media only screen and (orientation: portrait) {
             #rotate-warning { display: flex; }
-            #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel { display: none !important; }
+            #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel, #menu-btn { display: none !important; }
         }
 
         /* RESPONSIVE MOBILE LANDSCAPE */
@@ -459,6 +456,7 @@
             .character-sprite { width: 130px; height: 130px; }
             .char-gif { max-height: 130px; }
             .top-hud { top: 2px; left: 5px; right: 5px; }
+            .center-hud { margin-top: 25px; } /* Less margin on mobile */
             .player-status { padding: 3px; width: 45%; }
             .player-status span { font-size: 0.4rem !important; }
             .hp-bar-container { height: 6px; margin-top:2px; }
@@ -477,19 +475,13 @@
             .form-title { font-size: 0.5rem; margin-bottom: 2px; }
             .input-label { font-size: 0.4rem; }
             .rpg-input { padding: 3px; font-size: 0.5rem; }
-            
             #virtual-keyboard { gap: 2px; padding: 3px; margin-top: 2px; }
             .kb-key { padding: 6px 0; font-size: 0.6rem; width: 30px; }
             .kb-key.wide { width: 60px; }
             .kb-key.space { width: 120px; }
-            
             .modal h1 { font-size: 1.2rem; margin: 5px 0; }
-            
-            /* Compact Buttons for Mobile */
+            .start-btn, .leaderboard-btn, .lb-close, .settings-btn { padding: 6px 10px; font-size: 0.6rem; margin-top: 5px; min-width: 80px; }
             .btn-row { gap: 5px; margin-top: 5px; }
-            .start-btn { padding: 6px 15px; font-size: 0.8rem; margin-top: 5px; min-width: 120px; }
-            .secondary-btn { padding: 6px 10px; font-size: 0.6rem; margin-top: 5px; min-width: 60px; }
-            
             .modal-box { padding: 10px; gap: 10px; }
             .tut-icon { font-size: 1.2rem; }
             .tut-row { font-size: 0.6rem; margin-bottom: 5px; }
@@ -498,13 +490,25 @@
             .summary-col { max-height: 40vh; padding: 10px; }
             .summary-col h3 { font-size: 0.7rem; }
             .q-list-item { font-size: 0.5rem; line-height: 1.2; }
+            #menu-btn { padding: 5px 10px; font-size: 0.5rem; top: 2px; }
+            .pause-menu-btn { font-size: 0.8rem; padding: 10px; }
         }
     </style>
 </head>
 <body>
 
-    <!-- FULLSCREEN BUTTON -->
-    <button id="fs-btn" onclick="toggleFullscreen()">⛶ FULLSCREEN</button>
+    <!-- PAUSE MENU BUTTON (TOP CENTER) -->
+    <button id="menu-btn" onclick="togglePauseMenu()">MENU ⏸️</button>
+
+    <!-- PAUSE MENU MODAL -->
+    <div id="pause-modal" class="modal" style="display: none; background: rgba(0,0,0,0.85);">
+        <h1>PAUSE</h1>
+        <div class="modal-box" style="text-align: center; width: auto;">
+            <button class="secondary-btn pause-menu-btn" onclick="toggleFullscreen()">⛶ FULLSCREEN</button>
+            <button class="start-btn pause-menu-btn" onclick="togglePauseMenu()">▶️ LANJUTKAN</button>
+            <button class="secondary-btn pause-menu-btn" style="border-color: red; color: red;" onclick="confirmExitFromPause()">❌ KELUAR GAME</button>
+        </div>
+    </div>
 
     <!-- ROTATE WARNING -->
     <div id="rotate-warning">
@@ -683,8 +687,8 @@
                 <div class="atp-bar-container"><div class="atp-fill" id="p1-atp-bar"></div></div>
                 <div style="font-size: 0.6rem; color: #aaa; margin-top: 2px;">STREAK: <span id="p1-streak" style="color: gold;">0</span></div>
             </div>
-            <div style="text-align: center;">
-                <div style="font-size: 1.5rem; color: yellow; text-shadow: 2px 2px 0 #000; margin-top: 10px;">VS</div>
+            <div class="center-hud">
+                <div style="font-size: 1.5rem; color: yellow; text-shadow: 2px 2px 0 #000;">VS</div>
                 <div id="level-indicator" style="font-size: 0.6rem; color: #aaa; margin-top: 5px;">LEVEL 1</div>
             </div>
             <div class="player-status" style="border-color: var(--p2-color);">
@@ -776,6 +780,27 @@
                     document.exitFullscreen();
                 }
             }
+        }
+
+        // --- PAUSE MENU LOGIC ---
+        function togglePauseMenu() {
+            const modal = document.getElementById('pause-modal');
+            if (modal.style.display === 'none') {
+                modal.style.display = 'flex';
+                // Pause AI if needed? AI timer persists but won't act if locked. 
+                // Currently game is turn based so true pausing isn't critical, but we can block interaction.
+                state.locked = true; 
+            } else {
+                modal.style.display = 'none';
+                // Unlock only if it wasn't locked by gameplay
+                // For simplicity, we just unlock. If in middle of anim, it might glitch slightly but safe for turn based.
+                state.locked = false;
+            }
+        }
+
+        function confirmExitFromPause() {
+            togglePauseMenu(); // close menu
+            resetGame(); // direct exit
         }
 
         function setMode(mode) {
@@ -994,6 +1019,8 @@
 
         function startGame() {
             document.getElementById('tutorial-screen').style.display = 'none';
+            // Show menu button when game starts
+            document.getElementById('menu-btn').style.display = 'block';
             
             prepareQuestionDeck(); 
             state.qIndex = 0;
@@ -1159,15 +1186,13 @@
                 showDamage(player, "-10 (PENALTY!)", false);
                 updateUI();
                 
-                // Anti-Spam Delay Reset
-                 setTimeout(() => {
+                setTimeout(() => {
                     state[player].inPenalty = false;
                      allBtns.forEach(b => {
                         if (b !== btn) b.disabled = false;
                      });
                 }, 1500);
 
-                // Skip Logic Lvl 4-5
                 if (state.gameMode === 'single' && state.level >= 4 && player === 'p1') {
                     state.wrongAttempts++;
                     if (state.wrongAttempts >= 2) {
@@ -1175,8 +1200,7 @@
                          state.locked = true;
                          setTimeout(() => {
                              state.qIndex++;
-                             // Reset penalty explicitly before next question
-                             state[player].inPenalty = false; 
+                             state.p1.inPenalty = false; 
                              if (state.qIndex >= state.questions.length) {
                                  prepareQuestionDeck();
                                  state.qIndex = 0;
@@ -1201,16 +1225,10 @@
             const char1 = document.getElementById(`${attacker}-char`);
             const char2 = document.getElementById(`${defender}-char`);
             
-            // Logic khusus untuk P1 (Imun) ganti GIF attack
             if (attacker === 'p1') {
                 const p1Img = document.getElementById('p1-img');
-                // Simpan src idle
                 const idleSrc = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif";
-                // Ganti ke attack src
                 p1Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune_attack.gif";
-                
-                // Kembalikan ke idle setelah animasi selesai (misal 1 detik atau 800ms)
-                // Kita asumsikan durasi animasi attack sekitar 1 detik
                 setTimeout(() => {
                     p1Img.src = idleSrc;
                 }, 1000); 
@@ -1221,13 +1239,11 @@
             setTimeout(() => {
                 let damageText = isCrit ? "CRITICAL! -30" : "-15";
                 showDamage(defender, damageText, isCrit);
-                // Tambahkan efek merah (damage flash) ke GAMBAR lawan
                 const targetImg = document.getElementById(`${defender}-img`);
                 if(targetImg) {
                     targetImg.classList.add('damage-flash');
                     setTimeout(() => targetImg.classList.remove('damage-flash'), 400);
                 }
-
                 char2.classList.add('shake');
                 char1.style.transform = attacker === 'p2' ? 'scaleX(-1)' : 'none';
                 setTimeout(() => char2.classList.remove('shake'), 500);
@@ -1397,7 +1413,7 @@
             if (state.typeWriterInterval) clearInterval(state.typeWriterInterval);
             state = { p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 }, p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 }, qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] }, gameMode: 'single', level: 1, aiTimer: null, bossLives: 0, wrongAttempts: 0 };
             
-            // FORCE RESET BOSS VISUAL (FIXED NULL ERROR)
+            // FORCE RESET BOSS VISUAL (SAFE CHECK)
             const p2Char = document.getElementById('p2-char');
             if (p2Char) {
                 p2Char.classList.remove('boss-mode');
@@ -1406,9 +1422,9 @@
             
             const p1Char = document.getElementById('p1-char');
             if (p1Char) {
-                // Ensure we target the wrapper correctly
-                // Previous fix tried to find .character-sprite inside #p1-char, but #p1-char IS the wrapper
-                p1Char.style.transform = 'none';
+                 // Use optional chaining or check style existence
+                 const sprite = p1Char.querySelector('.character-sprite') || p1Char;
+                 if(sprite.style) sprite.style.transform = 'none';
             }
 
             // RESET IMAGES TO DEFAULT
@@ -1431,6 +1447,9 @@
             if (btn) btn.disabled = false;
             if (spinner) spinner.style.display = 'none';
 
+            // HIDE MENU BUTTON
+            document.getElementById('menu-btn').style.display = 'none';
+
             document.getElementById('game-over-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'flex';
             document.getElementById('scene-area').style.opacity = '1';
@@ -1444,7 +1463,6 @@
             focusInput('p1-input-name');
         }
 
-        // --- LEADERBOARD LOGIC (MERGED) ---
         async function openLeaderboard() {
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('leaderboard-screen').style.display = 'flex';
