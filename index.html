@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIO-WAR: RPG Edition (Version 8)</title>
+    <title>BIO-WAR: RPG Edition (Offline Support)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -31,7 +31,7 @@
         body {
             margin: 0;
             padding: 0;
-            background-color: #000;
+            background-color: #000; /* Fallback Hitam untuk Offline */
             font-family: 'Press Start 2P', cursive;
             overflow: hidden;
             height: 100vh; 
@@ -50,7 +50,7 @@
             width: 100%;
             height: 100%;
             background: #000;
-            z-index: 20000; /* Paling atas */
+            z-index: 20000;
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -58,504 +58,137 @@
             transition: opacity 0.5s ease-out;
         }
 
-        .loading-title {
-            color: var(--gold);
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            text-shadow: 4px 4px 0 #a00;
-            animation: pulse 1.5s infinite;
-        }
+        .loading-title { color: var(--gold); font-size: 1.5rem; margin-bottom: 20px; text-shadow: 4px 4px 0 #a00; animation: pulse 1.5s infinite; }
+        .loading-bar-container { width: 80%; max-width: 400px; height: 20px; border: 2px solid #fff; background: #222; margin-bottom: 10px; position: relative; }
+        .loading-bar-fill { height: 100%; width: 0%; background: var(--btn-correct); transition: width 0.2s; }
+        #loading-text { color: #aaa; font-size: 0.7rem; }
 
-        .loading-bar-container {
-            width: 80%;
-            max-width: 400px;
-            height: 20px;
-            border: 2px solid #fff;
-            background: #222;
-            margin-bottom: 10px;
-            position: relative;
-        }
-
-        .loading-bar-fill {
-            height: 100%;
-            width: 0%;
-            background: var(--btn-correct);
-            transition: width 0.2s;
-        }
-
-        #loading-text {
-            color: #aaa;
-            font-size: 0.7rem;
-        }
-
-        /* --- BACKGROUND MENU CLASS --- */
+        /* --- BACKGROUND & UI --- */
         .menu-bg-style {
-            background: 
-                linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
-                url('https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/background_title%20and%20menu_web.png') !important;
+            background-color: rgba(0, 0, 0, 1.00) !important; 
+            background-image: url('https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/background_title%20and%20menu_web.png') !important;
             background-size: cover !important;
             background-position: center !important;
             background-repeat: no-repeat !important;
         }
 
-        /* --- PAUSE MENU BUTTON --- */
-        #menu-btn {
-            position: fixed;
-            top: 5px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 12000;
-            background: rgba(0, 0, 0, 0.8);
-            color: var(--gold);
-            border: 2px solid var(--gold);
-            padding: 8px 15px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.7rem;
-            cursor: pointer;
-            border-radius: 5px;
-            display: none; 
-            box-shadow: 0 0 5px #000;
-        }
+        /* PAUSE BTN */
+        #menu-btn { position: fixed; top: 5px; left: 50%; transform: translateX(-50%); z-index: 12000; background: rgba(0, 0, 0, 0.8); color: var(--gold); border: 2px solid var(--gold); padding: 8px 15px; font-family: 'Press Start 2P', cursive; font-size: 0.7rem; cursor: pointer; border-radius: 5px; display: none; box-shadow: 0 0 5px #000; }
         #menu-btn:hover { background: var(--gold); color: #000; }
 
-        /* --- SCENE AREA --- */
+        /* SCENE */
         #scene-area {
-            flex: 3;
-            position: relative;
-            background-color: #1a0f0a;
-            background-image: 
-                url('https://raw.githubusercontent.com/HananUNY/simulasi-biologi/refs/heads/main/background_rpg.jpeg'),
-                repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(0,0,0,0.2) 40px, rgba(0,0,0,0.2) 42px),
-                linear-gradient(to bottom, #2c3e50 0%, #000 80%, #27ae60 80%);
-            background-size: cover, auto, auto; 
-            background-position: center bottom, top left, top left;
-            background-repeat: no-repeat, repeat, no-repeat;
-            overflow: hidden;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            padding: 0 50px 40px 50px;
+            flex: 3; position: relative; background-color: #000; /* Fallback Hitam */
+            background-image: url('https://raw.githubusercontent.com/HananUNY/simulasi-biologi/refs/heads/main/background_rpg.jpeg'), repeating-linear-gradient(90deg, transparent 0, transparent 40px, rgba(0,0,0,0.2) 40px, rgba(0,0,0,0.2) 42px), linear-gradient(to bottom, #2c3e50 0%, #000 80%, #27ae60 80%);
+            background-size: cover, auto, auto; background-position: center bottom, top left, top left; background-repeat: no-repeat, repeat, no-repeat;
+            overflow: hidden; display: flex; justify-content: space-between; align-items: flex-end; padding: 0 50px 40px 50px;
         }
 
         .bg-prop { display: none; }
-
-        .character-sprite {
-            position: relative;
-            width: 300px; 
-            height: 300px; 
-            z-index: 10;
-            display: flex;
-            justify-content: center;
-            align-items: flex-end; 
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        .char-gif {
-            width: 100%;        
-            height: auto;       
-            max-height: 100%;   
-            image-rendering: pixelated;
-            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5));
-            transition: filter 0.1s; 
-        }
-
-        .damage-flash {
-            filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(2) !important;
-        }
-
-        .boss-mode {
-            transform: scaleX(-1.5) scaleY(1.5) !important; 
-            filter: drop-shadow(0 0 20px red) hue-rotate(-30deg);
-            margin-right: 20px; 
-        }
-
-        .top-hud {
-            position: absolute;
-            top: 15px;
-            left: 20px;
-            right: 20px;
-            display: flex;
-            justify-content: space-between;
-            z-index: 100;
-            pointer-events: none;
-        }
-
-        .center-hud {
-            text-align: center;
-            margin-top: 40px; 
-            pointer-events: none;
-        }
-
-        .player-status {
-            width: 38%; 
-            background: rgba(0,0,0,0.7);
-            border: 4px solid #fff;
-            padding: 10px;
-            position: relative;
-            box-shadow: 4px 4px 0 #000;
-            pointer-events: auto;
-        }
-
-        .hp-bar-container {
-            width: 100%;
-            height: 20px;
-            background: #333;
-            margin-top: 5px;
-            border: 2px solid #555;
-            position: relative;
-        }
-
-        .hp-fill { height: 100%; transition: width 0.3s; }
+        .character-sprite { position: relative; width: 300px; height: 300px; z-index: 10; display: flex; justify-content: center; align-items: flex-end; transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        .char-gif { width: 100%; height: auto; max-height: 100%; image-rendering: pixelated; filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.5)); transition: filter 0.1s; }
         
-        .atp-bar-container {
-            width: 100%;
-            height: 8px;
-            background: #222;
-            margin-top: 4px;
-            border: 1px solid #444;
+        /* EMOJI FALLBACK STYLE */
+        .offline-avatar {
+            font-size: 150px;
+            filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+            animation: idleBounce 2s infinite;
+            display: none; /* Hidden by default */
         }
+
+        .damage-flash { filter: grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-50deg) saturate(600%) contrast(2) !important; }
+        .boss-mode { transform: scaleX(-1.5) scaleY(1.5) !important; filter: drop-shadow(0 0 20px red) hue-rotate(-30deg); margin-right: 20px; }
+
+        /* HUD */
+        .top-hud { position: absolute; top: 15px; left: 20px; right: 20px; display: flex; justify-content: space-between; z-index: 100; pointer-events: none; }
+        .center-hud { text-align: center; margin-top: 40px; pointer-events: none; }
+        .player-status { width: 38%; background: rgba(0,0,0,0.7); border: 4px solid #fff; padding: 10px; position: relative; box-shadow: 4px 4px 0 #000; pointer-events: auto; }
+        .hp-bar-container { width: 100%; height: 20px; background: #333; margin-top: 5px; border: 2px solid #555; position: relative; }
+        .hp-fill { height: 100%; transition: width 0.3s; }
+        .atp-bar-container { width: 100%; height: 8px; background: #222; margin-top: 4px; border: 1px solid #444; }
         .atp-fill { height: 100%; width: 0%; background: gold; transition: width 0.3s; }
 
-        /* --- CONTROL PANEL --- */
-        #control-panel {
-            flex: 2;
-            background: var(--ui-bg);
-            border-top: 6px solid #a0522d;
-            padding: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1.5fr 1fr;
-            gap: 15px;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.5);
-            position: relative;
-        }
-
-        .rpg-box {
-            background: #4e342e;
-            border: 4px solid;
-            border-image: linear-gradient(to bottom, #d7ccc8, #8d6e63) 1;
-            box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.5);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
+        /* CONTROL */
+        #control-panel { flex: 2; background: var(--ui-bg); border-top: 6px solid #a0522d; padding: 15px; display: grid; grid-template-columns: 1fr 1.5fr 1fr; gap: 15px; box-shadow: inset 0 0 50px rgba(0,0,0,0.5); position: relative; }
+        .rpg-box { background: #4e342e; border: 4px solid; border-image: linear-gradient(to bottom, #d7ccc8, #8d6e63) 1; box-shadow: inset 2px 2px 0 rgba(0,0,0,0.5), 4px 4px 0 rgba(0,0,0,0.5); padding: 20px; display: flex; flex-direction: column; justify-content: center; }
         #question-area { text-align: left; position: relative; }
         #q-title { color: gold; font-size: 0.9rem; margin-bottom: 15px; text-decoration: underline; }
-        
-        #q-text { 
-            font-size: 1.2rem;
-            line-height: 1.8;
-            color: #fff; 
-            white-space: pre-wrap;
-            letter-spacing: 1px;
-            text-shadow: 2px 2px 0 #000;
-        }
-
+        #q-text { font-size: 1.2rem; line-height: 1.8; color: #fff; white-space: pre-wrap; letter-spacing: 1px; text-shadow: 2px 2px 0 #000; }
         .player-controls { display: flex; flex-direction: column; gap: 10px; }
-
-        .btn-rpg {
-            background: var(--btn-normal);
-            color: #fff;
-            border: none;
-            border-bottom: 4px solid var(--btn-shadow);
-            padding: 12px 5px;
-            font-family: 'Press Start 2P', cursive;
-            font-size: 0.8rem;
-            cursor: pointer;
-            text-align: left;
-            position: relative;
-            text-shadow: 1px 1px 0 #000;
-        }
-
+        .btn-rpg { background: var(--btn-normal); color: #fff; border: none; border-bottom: 4px solid var(--btn-shadow); padding: 12px 5px; font-family: 'Press Start 2P', cursive; font-size: 0.8rem; cursor: pointer; text-align: left; position: relative; text-shadow: 1px 1px 0 #000; }
         .btn-rpg:active { transform: translateY(4px); border-bottom: none; }
         .btn-rpg:disabled { filter: grayscale(1); cursor: not-allowed; opacity: 0.7; transform: scale(0.98); }
-
         .p-label { text-align: center; font-size: 0.7rem; margin-bottom: 5px; color: #aaa; text-transform: uppercase; }
-
         .skill-row { display: flex; gap: 5px; margin-bottom: 5px; }
-        
-        .skill-btn {
-            flex: 1;
-            background: #2d2d2d;
-            border: 2px solid #555;
-            color: #888;
-            padding: 8px 5px;
-            font-size: 0.6rem;
-            font-family: 'Press Start 2P', cursive;
-            cursor: pointer;
-            text-align: center;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            gap: 3px;
-            transition: all 0.2s;
-            position: relative;
-        }
-
-        .skill-btn.ready {
-            border-color: gold;
-            color: white;
-            background: #5d4037;
-            box-shadow: 0 0 5px gold;
-            animation: pulse 2s infinite;
-        }
+        .skill-btn { flex: 1; background: #2d2d2d; border: 2px solid #555; color: #888; padding: 8px 5px; font-size: 0.6rem; font-family: 'Press Start 2P', cursive; cursor: pointer; text-align: center; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; transition: all 0.2s; position: relative; }
+        .skill-btn.ready { border-color: gold; color: white; background: #5d4037; box-shadow: 0 0 5px gold; animation: pulse 2s infinite; }
         .skill-btn:active { transform: scale(0.95); }
         .skill-emoji { font-size: 1.2rem; margin-bottom: 2px; }
 
         @keyframes idleBounce { 0% { transform: translateY(0); } 100% { transform: translateY(-5px); } }
         @keyframes pulse { 0% { transform: scale(1); box-shadow: 0 0 5px gold; } 50% { transform: scale(1.02); box-shadow: 0 0 15px gold; } 100% { transform: scale(1); box-shadow: 0 0 5px gold; } }
         
-        .dmg-popup {
-            position: absolute;
-            font-size: 2rem;
-            color: red;
-            text-shadow: 2px 2px 0 #fff;
-            animation: floatUp 1s forwards;
-            z-index: 100;
-        }
-        .crit-popup {
-            color: gold;
-            font-size: 2.5rem;
-            font-weight: bold;
-            text-shadow: 3px 3px 0 #ff0000;
-        }
+        .dmg-popup { position: absolute; font-size: 2rem; color: red; text-shadow: 2px 2px 0 #fff; animation: floatUp 1s forwards; z-index: 100; }
+        .crit-popup { color: gold; font-size: 2.5rem; font-weight: bold; text-shadow: 3px 3px 0 #ff0000; }
         @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-50px); opacity: 0; } }
-        
         .shake { animation: shake 0.5s; }
         @keyframes shake { 0% { transform: translateX(0); } 25% { transform: translateX(-5px); } 50% { transform: translateX(5px); } 100% { transform: translateX(0); } }
+        @keyframes bossRevive { 0% { transform: scale(0); opacity: 0; } 50% { transform: scale(1.5); opacity: 1; } 100% { transform: scale(1); opacity: 1; } }
+        .revive-effect { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 3rem; color: red; font-weight: bold; text-shadow: 0 0 20px yellow; z-index: 200; animation: bossRevive 1s ease-out forwards; white-space: nowrap; }
+        @keyframes titleFloat { 0% { transform: translateY(0) scale(1); text-shadow: 4px 4px 0 #a00; } 50% { transform: translateY(-10px) scale(1.05); text-shadow: 6px 6px 0 #a00, 0 0 20px gold; } 100% { transform: translateY(0) scale(1); text-shadow: 4px 4px 0 #a00; } }
 
-        @keyframes bossRevive {
-            0% { transform: scale(0); opacity: 0; }
-            50% { transform: scale(1.5); opacity: 1; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        .revive-effect {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 3rem; color: red; font-weight: bold;
-            text-shadow: 0 0 20px yellow;
-            z-index: 200;
-            animation: bossRevive 1s ease-out forwards;
-            white-space: nowrap;
-        }
-
-        /* --- TITLE SCREEN ANIMATIONS --- */
-        @keyframes titleFloat {
-            0% { transform: translateY(0) scale(1); text-shadow: 4px 4px 0 #a00; }
-            50% { transform: translateY(-10px) scale(1.05); text-shadow: 6px 6px 0 #a00, 0 0 20px gold; }
-            100% { transform: translateY(0) scale(1); text-shadow: 4px 4px 0 #a00; }
-        }
-
-        /* --- MODAL GENERAL --- */
-        .modal {
-            position: fixed; top:0; left:0; width:100%; height:100%;
-            background: rgba(0,0,0,0.95);
-            display: flex; flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 999;
-            text-align: center;
-            padding: 10px;
-            overflow-y: auto;
-        }
-        
+        /* MODALS */
+        .modal { position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.95); display: flex; flex-direction: column; justify-content: center; align-items: center; z-index: 999; text-align: center; padding: 10px; overflow-y: auto; }
         .modal h1 { color: gold; font-size: 2rem; margin: 20px 0; text-shadow: 4px 4px 0 #a00; }
-        
-        /* TITLE SCREEN SPECIFIC */
-        .title-text {
-            font-size: 3rem;
-            color: gold;
-            text-align: center;
-            margin-bottom: 40px;
-            animation: titleFloat 3s infinite ease-in-out;
-            line-height: 1.5;
-        }
-        
-        .title-footer {
-            position: absolute;
-            bottom: 20px;
-            font-size: 0.6rem;
-            color: #aaa;
-            text-shadow: 1px 1px 0 #000;
-        }
-
-        .title-btn-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            width: 100%;
-            max-width: 400px;
-            align-items: center;
-        }
-
-        .big-menu-btn {
-            width: 100%;
-            padding: 20px;
-            font-size: 1.2rem;
-            background: linear-gradient(to bottom, #d2691e, #8b4500);
-            border: 4px solid white;
-            color: white;
-            font-family: 'Press Start 2P', cursive;
-            cursor: pointer;
-            box-shadow: 0 6px 0 #3e2723, 0 10px 10px rgba(0,0,0,0.5);
-            transition: all 0.1s;
-        }
+        .title-text { font-size: 3rem; color: gold; text-align: center; margin-bottom: 40px; animation: titleFloat 3s infinite ease-in-out; line-height: 1.5; }
+        .title-footer { position: absolute; bottom: 20px; font-size: 0.6rem; color: #aaa; text-shadow: 1px 1px 0 #000; }
+        .title-btn-container { display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 400px; align-items: center; }
+        .big-menu-btn { width: 100%; padding: 20px; font-size: 1.2rem; background: linear-gradient(to bottom, #d2691e, #8b4500); border: 4px solid white; color: white; font-family: 'Press Start 2P', cursive; cursor: pointer; box-shadow: 0 6px 0 #3e2723, 0 10px 10px rgba(0,0,0,0.5); transition: all 0.1s; }
         .big-menu-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3e2723; }
-
-        .small-menu-btn {
-            width: 80%;
-            padding: 15px;
-            font-size: 0.8rem;
-            background: #0088cc;
-            border: 2px solid white;
-            color: white;
-            font-family: 'Press Start 2P', cursive;
-            cursor: pointer;
-            box-shadow: 0 4px 0 #005580;
-            transition: all 0.1s;
-        }
+        .small-menu-btn { width: 80%; padding: 15px; font-size: 0.8rem; background: #0088cc; border: 2px solid white; color: white; font-family: 'Press Start 2P', cursive; cursor: pointer; box-shadow: 0 4px 0 #005580; transition: all 0.1s; }
         .small-menu-btn:active { transform: translateY(4px); box-shadow: none; }
-        
-        /* BUTTONS GENERAL */
-        .btn-row { 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            gap: 15px; 
-            margin-top: 15px; 
-            margin-bottom: 20px; 
-            width: 100%;
-            max-width: 900px;
-            flex-wrap: wrap;
-        }
-
-        .start-btn {
-            background: #00aa00; padding: 15px 40px;
-            color: white; font-family: 'Press Start 2P'; font-size: 1.2rem;
-            border: 4px solid #fff; cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            min-width: 250px;
-            box-shadow: 0 0 15px #00ff00;
-            animation: pulse 2s infinite;
-            order: 2; 
-        }
+        .btn-row { display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 15px; margin-bottom: 20px; width: 100%; max-width: 900px; flex-wrap: wrap; }
+        .start-btn { background: #00aa00; padding: 15px 40px; color: white; font-family: 'Press Start 2P'; font-size: 1.2rem; border: 4px solid #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; min-width: 250px; box-shadow: 0 0 15px #00ff00; animation: pulse 2s infinite; order: 2; }
         .start-btn:disabled { background: #555; cursor: wait; animation: none; box-shadow: none; }
-
-        .secondary-btn {
-            background: #0088cc; padding: 12px 20px;
-            color: white; font-family: 'Press Start 2P'; font-size: 0.7rem;
-            border: 2px solid #fff; cursor: pointer;
-            min-width: 120px;
-            transition: transform 0.1s;
-        }
+        .secondary-btn { background: #0088cc; padding: 12px 20px; color: white; font-family: 'Press Start 2P'; font-size: 0.7rem; border: 2px solid #fff; cursor: pointer; min-width: 120px; transition: transform 0.1s; }
         .secondary-btn:active { transform: translateY(3px); }
         .settings-btn { background: #555; color: #ccc; border-color: #999; order: 1; }
         .leaderboard-btn { background: #0088cc; border-color: #00ffff; order: 3; }
-        
-        /* PAUSE MENU BTNS */
-        .pause-menu-btn {
-            width: 100%;
-            max-width: 300px;
-            margin-bottom: 10px;
-            padding: 15px;
-            font-size: 1rem;
-        }
-
-        /* MODAL BOX */
-        .modal-box {
-            width: 95%; max-width: 900px; background: #2e1a12; border: 4px solid #8b4513; 
-            padding: 20px; text-align: left; margin-bottom: 20px;
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            display: flex; flex-direction: column; gap: 15px;
-        }
-
-        /* ABOUT BOX CONTENT */
-        .about-content {
-            text-align: left;
-            font-size: 0.7rem;
-            line-height: 1.6;
-            color: #ddd;
-        }
-        .about-section-title {
-            color: gold;
-            margin-top: 15px;
-            margin-bottom: 5px;
-            font-size: 0.8rem;
-            text-decoration: underline;
-        }
-        .about-link {
-            color: #00ffff;
-            text-decoration: none;
-            word-break: break-all;
-        }
+        .pause-menu-btn { width: 100%; max-width: 300px; margin-bottom: 10px; padding: 15px; font-size: 1rem; }
+        .modal-box { width: 95%; max-width: 900px; background: #2e1a12; border: 4px solid #8b4513; padding: 20px; text-align: left; margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 15px; }
+        .about-content { text-align: left; font-size: 0.7rem; line-height: 1.6; color: #ddd; }
+        .about-section-title { color: gold; margin-top: 15px; margin-bottom: 5px; font-size: 0.8rem; text-decoration: underline; }
+        .about-link { color: #00ffff; text-decoration: none; word-break: break-all; }
         .about-link:hover { text-decoration: underline; }
-
-        /* Containers sharing modal-box style */
-        .form-container, .tutorial-content, .settings-content, #leaderboard-content, .summary-container {
-            width: 100%; max-width: 100%; background: transparent; border: none; padding: 0; box-shadow: none;
-            display: flex; flex-direction: column; gap: 15px;
-        }
+        .form-container, .tutorial-content, .settings-content, #leaderboard-content, .summary-container { width: 100%; max-width: 100%; background: transparent; border: none; padding: 0; box-shadow: none; display: flex; flex-direction: column; gap: 15px; }
         .form-container { flex-direction: row; justify-content: center; gap: 30px; }
         .summary-container { flex-direction: row; gap: 20px; }
-
-        /* FORM */
-        .player-form {
-            flex: 1; background: rgba(0,0,0,0.5); border: 2px solid #fff; padding: 15px; border-radius: 8px;
-            transition: all 0.3s; min-width: 300px;
-        }
+        .player-form { flex: 1; background: rgba(0,0,0,0.5); border: 2px solid #fff; padding: 15px; border-radius: 8px; transition: all 0.3s; min-width: 300px; }
         .player-form.hidden { display: none; }
         .form-title { font-size: 0.9rem; margin-bottom: 15px; text-decoration: underline; text-align: center; font-weight: bold; }
         .input-group { margin-bottom: 10px; text-align: left; }
         .input-label { font-size: 0.6rem; color: #aaa; margin-bottom: 4px; display: block; }
-        .rpg-input {
-            width: 100%; padding: 10px; background: #111; border: 2px solid #555;
-            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.8rem; outline: none;
-        }
+        .rpg-input { width: 100%; padding: 10px; background: #111; border: 2px solid #555; color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.8rem; outline: none; }
         .rpg-input:focus { border-color: gold; background: #222; }
-
-        /* MODE TOGGLE */
         .mode-selector { display: flex; gap: 15px; margin-bottom: 15px; justify-content: center; }
-        .mode-btn {
-            padding: 10px 20px; border: 2px solid #555; background: #222; color: #aaa;
-            font-family: 'Press Start 2P'; cursor: pointer; font-size: 0.7rem;
-        }
+        .mode-btn { padding: 10px 20px; border: 2px solid #555; background: #222; color: #aaa; font-family: 'Press Start 2P'; cursor: pointer; font-size: 0.7rem; }
         .mode-btn.active { border-color: gold; color: gold; background: #333; box-shadow: 0 0 10px gold; }
-
-        /* KEYBOARD */
-        #virtual-keyboard {
-            width: 100%; max-width: 900px; background: #2e1a12; border: 3px solid #8b4513;
-            padding: 10px; display: flex; flex-direction: column; gap: 5px; margin-top: 5px; align-self: center;
-        }
+        #virtual-keyboard { width: 100%; max-width: 900px; background: #2e1a12; border: 3px solid #8b4513; padding: 10px; display: flex; flex-direction: column; gap: 5px; margin-top: 5px; align-self: center; }
         .kb-row { display: flex; justify-content: center; gap: 5px; }
-        .kb-key {
-            padding: 12px 0; width: 45px; background: #5d4037; border: 2px solid #8b4513;
-            color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.9rem; 
-            cursor: pointer; box-shadow: 0 4px 0 #3e2723; touch-action: manipulation; 
-        }
+        .kb-key { padding: 12px 0; width: 45px; background: #5d4037; border: 2px solid #8b4513; color: #fff; font-family: 'Press Start 2P', cursive; font-size: 0.9rem; cursor: pointer; box-shadow: 0 4px 0 #3e2723; touch-action: manipulation; }
         .kb-key:active { transform: translateY(3px); box-shadow: none; }
         .kb-key.wide { width: 90px; }
         .kb-key.space { width: 250px; }
-
-        /* TUTORIAL & SETTINGS */
         .tut-section { margin-bottom: 15px; border-bottom: 2px dashed #555; padding-bottom: 10px; }
         .tut-row { display: flex; align-items: center; gap: 15px; margin-bottom: 8px; font-size: 0.8rem; line-height: 1.5; }
         .tut-icon { font-size: 1.5rem; width: 40px; text-align: center; }
         .settings-content { text-align: center; align-items: center; }
         .tut-code { background: #111; color: #00ff00; padding: 8px; font-family: monospace; font-size: 0.7rem; display: block; margin: 10px 0; word-break: break-all; border: 1px dashed #444; }
-
-        /* LEADERBOARD */
-        #leaderboard-content {
-            width: 95%; max-width: 1000px; background: #2e1a12; border: 4px solid #8b4513;
-            padding: 15px; margin-bottom: 10px;
-            display: flex; flex-direction: column; align-items: center;
-        }
+        #leaderboard-content { width: 95%; max-width: 1000px; background: #2e1a12; border: 4px solid #8b4513; padding: 15px; margin-bottom: 10px; display: flex; flex-direction: column; align-items: center; }
         .lb-filters { display: flex; gap: 15px; width: 100%; justify-content: center; flex-wrap: wrap; }
         .lb-filter-group { display: flex; flex-direction: column; align-items: flex-start; gap: 5px; }
         .lb-filter-group label { font-size: 0.6rem; color: #aaa; text-transform: uppercase; }
-        .lb-select {
-            padding: 8px; background: #222; color: white; border: 2px solid #8b4513;
-            font-family: 'Press Start 2P', cursive; font-size: 0.7rem; cursor: pointer; min-width: 200px;
-        }
+        .lb-select { padding: 8px; background: #222; color: white; border: 2px solid #8b4513; font-family: 'Press Start 2P', cursive; font-size: 0.7rem; cursor: pointer; min-width: 200px; }
         .lb-select:hover { border-color: gold; }
         .lb-table-wrapper { width: 100%; overflow-y: auto; max-height: 50vh; border: 1px solid #444; }
         .lb-table { width: 100%; border-collapse: collapse; font-size: 0.7rem; text-align: left; }
@@ -566,36 +199,34 @@
         .lb-refresh { background: #00aa00; padding: 8px 20px; font-size: 0.7rem; border: 2px solid white; cursor: pointer; color: white; font-family: inherit; margin-bottom: 10px; align-self: center; }
         .mode-badge { padding: 2px 5px; border-radius: 3px; font-size: 0.5rem; margin-right: 5px; border: 1px solid #555; }
         .school-tag { color: #888; font-style: italic; font-size: 0.6rem; display: block; margin-top: 4px; }
-
-        /* SUMMARY */
         .summary-col { flex: 1; background: #2e1a12; border: 3px solid #8b4513; padding: 15px; text-align: left; max-height: 50vh; overflow-y: auto; }
         .summary-col h3 { margin-top: 0; border-bottom: 2px solid #555; padding-bottom: 10px; font-size: 1rem; }
         .q-list-item { font-size: 0.7rem; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px dashed #444; line-height: 1.4; color: #ddd; }
-
-        /* UPLOAD STATUS */
         #upload-status { font-size: 0.8rem; margin-top: 10px; padding: 10px; border: 1px dashed #777; background: rgba(0,0,0,0.5); color: yellow; display: none; animation: pulse 1s infinite; }
-
-        /* SPINNER */
         .spinner { border: 4px solid #f3f3f3; border-top: 4px solid #00aa00; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        /* ROTATE WARNING */
         #rotate-warning { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 10000; flex-direction: column; justify-content: center; align-items: center; text-align: center; color: white; padding: 20px; }
         .rotate-icon { font-size: 4rem; animation: rotatePhone 2s infinite; margin-bottom: 20px; }
         @keyframes rotatePhone { 0% { transform: rotate(0deg); } 50% { transform: rotate(-90deg); } 100% { transform: rotate(0deg); } }
+
+        /* --- AUDIO CONTROL STYLES --- */
+        .audio-controls { display: flex; gap: 10px; justify-content: center; width: 100%; margin-bottom: 15px; }
+        .audio-btn { font-size: 0.6rem; padding: 8px 12px; border: 2px solid white; color: white; background: #333; cursor: pointer; font-family: 'Press Start 2P'; transition: all 0.2s; }
+        .audio-btn:hover { border-color: gold; color: gold; }
+        .audio-btn.muted { background: #500; color: #aaa; border-color: #777; }
 
         @media only screen and (orientation: portrait) {
             #rotate-warning { display: flex; }
             #loading-overlay, #title-screen, #about-screen, #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel, #menu-btn { display: none !important; }
         }
 
-        /* RESPONSIVE MOBILE LANDSCAPE */
         @media only screen and (max-width: 900px) and (orientation: landscape) {
             #scene-area { flex: 1.5; padding: 0 10px 10px 10px; } 
             .character-sprite { width: 130px; height: 130px; }
             .char-gif { max-height: 130px; }
+            .offline-avatar { font-size: 80px; } /* Smaller emoji on mobile */
             .top-hud { top: 2px; left: 5px; right: 5px; }
-            .center-hud { margin-top: 25px; } /* Less margin on mobile */
+            .center-hud { margin-top: 25px; }
             .player-status { padding: 3px; width: 45%; }
             .player-status span { font-size: 0.4rem !important; }
             .hp-bar-container { height: 6px; margin-top:2px; }
@@ -631,8 +262,6 @@
             .q-list-item { font-size: 0.5rem; line-height: 1.2; }
             #menu-btn { padding: 5px 10px; font-size: 0.5rem; top: 2px; }
             .pause-menu-btn { font-size: 0.8rem; padding: 10px; }
-            
-            /* TITLE SCREEN MOBILE */
             .title-text { font-size: 1.5rem; margin-bottom: 20px; }
             .big-menu-btn { padding: 10px; font-size: 0.8rem; }
             .small-menu-btn { padding: 8px; font-size: 0.6rem; }
@@ -641,6 +270,21 @@
     </style>
 </head>
 <body>
+
+    <!-- AUDIO SYSTEM (UPDATED) -->
+    <!-- 
+         GANTI LINK DI BAWAH INI SESUAI KEINGINAN ANDA.
+         Saya sudah pasang link contoh yang berfungsi agar Anda bisa tes.
+    -->
+    <audio id="bgm-menu" loop src="https://assets.mixkit.co/music/preview/mixkit-mystery-forest-2638.mp3"></audio> <!-- Menu Music -->
+    <audio id="bgm-game" loop src="https://assets.mixkit.co/music/preview/mixkit-medieval-battle-2646.mp3"></audio> <!-- Battle Music -->
+    
+    <audio id="sfx-click" src="https://assets.mixkit.co/sfx/preview/mixkit-modern-technology-select-3124.mp3"></audio> <!-- Tombol Click -->
+    <audio id="sfx-attack" src="https://assets.mixkit.co/sfx/preview/mixkit-sword-slash-swoosh-1476.mp3"></audio> <!-- Suara Menyerang -->
+    <audio id="sfx-hit" src="https://assets.mixkit.co/sfx/preview/mixkit-small-hit-in-a-game-2072.mp3"></audio> <!-- Suara Kena Hit -->
+    <audio id="sfx-skill" src="https://assets.mixkit.co/sfx/preview/mixkit-magical-coin-win-1936.mp3"></audio> <!-- Suara Skill -->
+    <audio id="sfx-win" src="https://assets.mixkit.co/sfx/preview/mixkit-winning-chimes-2015.mp3"></audio> <!-- Suara Menang -->
+    <audio id="sfx-lose" src="https://assets.mixkit.co/sfx/preview/mixkit-player-losing-or-failing-2042.mp3"></audio> <!-- Suara Kalah -->
 
     <!-- LOADING OVERLAY -->
     <div id="loading-overlay">
@@ -674,6 +318,13 @@
     <!-- NEW TITLE SCREEN -->
     <div id="title-screen" class="modal menu-bg-style">
         <div class="title-text">BIO-WAR<br>RPG</div>
+        
+        <!-- AUDIO CONTROLS (NEW) -->
+        <div class="audio-controls">
+            <button id="btn-mute-bgm" class="audio-btn" onclick="toggleMuteBGM()">MUSIC: ON 🎵</button>
+            <button id="btn-mute-sfx" class="audio-btn" onclick="toggleMuteSFX()">SFX: ON 🔊</button>
+        </div>
+
         <div class="title-btn-container">
             <button class="big-menu-btn" onclick="showLoginScreen()">▶️ MASUK GAME</button>
             <button class="small-menu-btn" onclick="openSettings()">⚙️ PENGATURAN SOAL</button>
@@ -688,7 +339,7 @@
         <h1>TENTANG</h1>
         <div class="modal-box about-content">
             <div class="about-section-title">INFO GAME</div>
-            <div>Versi: v8.00 (RPG Edition)</div>
+            <div>Versi: v9.01 (Audio Update)</div>
             <div>Tanggal Diupdate: 02 Desember 2025</div>
             <div>Pengembang: Tim SMA Negeri 1 Bantul</div>
 
@@ -697,6 +348,7 @@
                 <li>Background: Generated AI (Gemini Nano Banana)</li>
                 <li>Karakter Imun: <a href="https://craftpix.net/freebies/free-pixel-art-tiny-hero-sprites/?utm_campaign=Website&utm_source=itch.io&utm_medium=public" target="_blank" class="about-link">Free Pixel Art Tiny Hero Sprites (Craftpix)</a></li>
                 <li>Karakter Bakteri: <a href="https://lin-ain.itch.io/slime" target="_blank" class="about-link">Slime (Lin-Ain @ itch.io)</a></li>
+                <li>Audio: Mixkit.co (Free License)</li>
             </ul>
 
             <div class="about-section-title">KONTAK</div>
@@ -886,12 +538,14 @@
             </div>
         </div>
         <div id="p1-char" class="character-sprite">
-            <!-- IMMUNE SYSTEM ASSET -->
-            <img src="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif" alt="P1" class="char-gif" id="p1-img">
+            <!-- P1 Fallback System -->
+            <img src="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif" alt="P1" class="char-gif" id="p1-img" onerror="this.style.display='none'; document.getElementById('p1-offline').style.display='block';">
+            <div id="p1-offline" class="offline-avatar">👮</div>
         </div>
         <div id="p2-char" class="character-sprite" style="transform: scaleX(-1);">
-            <!-- BACTERIA ASSET (DEFAULT) -->
-            <img src="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif" alt="P2" class="char-gif" id="p2-img">
+            <!-- P2 Fallback System -->
+            <img src="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif" alt="P2" class="char-gif" id="p2-img" onerror="this.style.display='none'; document.getElementById('p2-offline').style.display='block';">
+            <div id="p2-offline" class="offline-avatar">👾</div>
         </div>
     </div>
 
@@ -930,6 +584,105 @@
         let FULL_QUESTION_DATABASE = []; 
         let allLeaderboardData = []; 
 
+        // --- BACKUP SOAL (OFFLINE) ---
+        const BACKUP_QUESTIONS = [
+            { q: "Apa fungsi utama sel darah putih?", a: ["Melawan penyakit", "Mengangkut oksigen", "Membekukan darah"], difficulty: "mudah" },
+            { q: "Zat asing yang memicu respons imun disebut?", a: ["Antigen", "Antibodi", "Antibiotik"], difficulty: "mudah" },
+            { q: "Vaksin biasanya berisi?", a: ["Mikroba yang dilemahkan", "Antibodi murni", "Vitamin C"], difficulty: "mudah" },
+            { q: "Virus HIV menyerang sel apa?", a: ["Sel T CD4", "Sel Darah Merah", "Trombosit"], difficulty: "sedang" },
+            { q: "Pertahanan tubuh pertama adalah?", a: ["Kulit & Membran Mukosa", "Sel Darah Putih", "Antibodi"], difficulty: "mudah" },
+            { q: "Imunitas dari ibu ke bayi disebut?", a: ["Pasif Alami", "Aktif Alami", "Pasif Buatan"], difficulty: "sedang" },
+            { q: "Sel yang 'memakan' kuman disebut?", a: ["Fagosit", "Limfosit", "Eritrosit"], difficulty: "sedang" },
+            { q: "Antibodi dihasilkan oleh?", a: ["Sel B", "Sel T", "Makrofag"], difficulty: "sedang" },
+            { q: "Tanda peradangan (inflamasi) kecuali?", a: ["Dingin", "Merah", "Bengkak"], difficulty: "sulit" },
+            { q: "Penyakit imun menyerang diri sendiri disebut?", a: ["Autoimun", "Imunodefisiensi", "Alergi"], difficulty: "sulit" }
+        ];
+
+        // --- AUDIO SYSTEM UPDATED ---
+        let isBgmMuted = false;
+        let isSfxMuted = false;
+
+        function toggleMuteBGM() {
+            isBgmMuted = !isBgmMuted;
+            const btn = document.getElementById('btn-mute-bgm');
+            
+            if (isBgmMuted) {
+                btn.innerText = "MUSIC: OFF 🔇";
+                btn.classList.add('muted');
+                stopAllBGM();
+            } else {
+                btn.innerText = "MUSIC: ON 🎵";
+                btn.classList.remove('muted');
+                // Play music based on current screen
+                if(document.getElementById('title-screen').style.display !== 'none') {
+                    playBGM('menu');
+                } else if(document.getElementById('scene-area').style.display !== 'none') {
+                    playBGM('game');
+                }
+            }
+        }
+
+        function toggleMuteSFX() {
+            isSfxMuted = !isSfxMuted;
+            const btn = document.getElementById('btn-mute-sfx');
+            if(isSfxMuted) {
+                btn.innerText = "SFX: OFF 🔇";
+                btn.classList.add('muted');
+            } else {
+                btn.innerText = "SFX: ON 🔊";
+                btn.classList.remove('muted');
+                playSound('sfx-click'); // Test sound
+            }
+        }
+
+        function playSound(id) {
+            if (isSfxMuted) return;
+            const el = document.getElementById(id);
+            if (el && el.src) {
+                el.currentTime = 0;
+                el.play().catch(e => console.log("Audio play blocked/error:", e));
+            }
+        }
+
+        function playBGM(type) {
+            if (isBgmMuted) return;
+            
+            const menuBgm = document.getElementById('bgm-menu');
+            const gameBgm = document.getElementById('bgm-game');
+
+            // Reset both first
+            menuBgm.pause(); 
+            gameBgm.pause();
+
+            if (type === 'menu') {
+                gameBgm.currentTime = 0;
+                menuBgm.play().catch(e => console.log("BGM Autoplay blocked"));
+            } else if (type === 'game') {
+                menuBgm.currentTime = 0;
+                gameBgm.play().catch(e => console.log("BGM Autoplay blocked"));
+            }
+        }
+
+        function stopAllBGM() {
+            const menuBgm = document.getElementById('bgm-menu');
+            const gameBgm = document.getElementById('bgm-game');
+            if(menuBgm) menuBgm.pause();
+            if(gameBgm) gameBgm.pause();
+        }
+
+        // Global Click Sound Listener
+        document.addEventListener('click', function(e) {
+            // Check if clicked element is a button or inside a button
+            if (e.target.tagName === 'BUTTON' || e.target.closest('button')) {
+                playSound('sfx-click');
+            }
+            // Logic to start menu music on first interaction (browser policy)
+            const menuBgm = document.getElementById('bgm-menu');
+            if (!isBgmMuted && menuBgm && menuBgm.paused && document.getElementById('title-screen').style.display !== 'none') {
+                playBGM('menu');
+            }
+        });
+
         // --- ASSET PRELOADING ---
         const assetsToLoad = [
             "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/background_title%20and%20menu_web.png",
@@ -957,7 +710,7 @@
                         resolve();
                     };
                     img.onerror = () => {
-                        console.warn("Gagal memuat:", src);
+                        console.warn("Gagal memuat (Offline mode active):", src);
                         loaded++; // Tetap lanjut meski error
                         resolve(); 
                     };
@@ -1073,7 +826,7 @@
 
         function closeSettings() {
             document.getElementById('settings-screen').style.display = 'none';
-            document.getElementById('title-screen').style.display = 'flex'; // Back to Title
+            document.getElementById('title-screen').style.display = 'flex'; 
         }
 
         function saveCustomSheet() {
@@ -1108,11 +861,31 @@
             }
         });
 
+        // --- OFFLINE SUPPORTED QUESTION LOADER ---
         function loadQuestionsFromSheet() {
             return new Promise((resolve) => {
-                if (!activeSheetID || activeSheetID.length < 10) { resolve(); return; }
+                // If ID is default, we can try fetching, but if offline, skip to backup
+                if (!navigator.onLine) {
+                    console.log("Offline detected: Using backup questions.");
+                    FULL_QUESTION_DATABASE = BACKUP_QUESTIONS;
+                    resolve();
+                    return;
+                }
+
+                if (!activeSheetID || activeSheetID.length < 10) { 
+                    FULL_QUESTION_DATABASE = BACKUP_QUESTIONS;
+                    resolve(); return; 
+                }
                 
+                // Set timeout for fetch fallback
+                const timeoutId = setTimeout(() => {
+                    console.log("Fetch timeout: Using backup questions.");
+                    FULL_QUESTION_DATABASE = BACKUP_QUESTIONS;
+                    resolve();
+                }, 5000);
+
                 window.handleSheetData = function(json) {
+                    clearTimeout(timeoutId);
                     try {
                         const rows = json.table.rows;
                         const newQuestions = [];
@@ -1127,11 +900,21 @@
                             newQuestions.push({ q: qText, a: [ ansCorrect, ansWrong1, ansWrong2 ], difficulty: difficulty.toLowerCase() });
                         });
                         if (newQuestions.length > 0) FULL_QUESTION_DATABASE = newQuestions;
-                    } catch (err) { console.error(err); } finally { resolve(); }
+                        else FULL_QUESTION_DATABASE = BACKUP_QUESTIONS;
+                    } catch (err) { 
+                        console.error(err); 
+                        FULL_QUESTION_DATABASE = BACKUP_QUESTIONS;
+                    } finally { resolve(); }
                 };
+                
                 const script = document.createElement('script');
                 script.src = `https://docs.google.com/spreadsheets/d/${activeSheetID}/gviz/tq?tqx=responseHandler:handleSheetData`;
-                script.onerror = () => resolve();
+                script.onerror = () => { 
+                    clearTimeout(timeoutId);
+                    console.log("Script error: Using backup questions.");
+                    FULL_QUESTION_DATABASE = BACKUP_QUESTIONS; 
+                    resolve(); 
+                };
                 document.body.appendChild(script);
             });
         }
@@ -1149,6 +932,9 @@
             let deck = [];
             const shuffle = (arr) => arr.sort(() => Math.random() - 0.5);
             const pick = (arr, count) => shuffle(arr).slice(0, count);
+
+            // Jika database kosong (masalah fetch), pakai backup
+            if (FULL_QUESTION_DATABASE.length === 0) FULL_QUESTION_DATABASE = BACKUP_QUESTIONS;
 
             if (state.gameMode === 'single') {
                 if (state.level <= 2) {
@@ -1264,18 +1050,29 @@
             // Show menu button when game starts
             document.getElementById('menu-btn').style.display = 'block';
             
+            // PLAY BGM (Switch to Game Music)
+            playBGM('game');
+
             prepareQuestionDeck(); 
             state.qIndex = 0;
             state.history = { p1: [], p2: [] };
             
-            // RESET IMAGES & VISUALS
+            // RESET VISUALS
             const p2Img = document.getElementById('p2-img');
             const p2Char = document.getElementById('p2-char');
-            const p1Char = document.getElementById('p1-char');
-            
             p2Char.classList.remove('boss-mode');
-            state.bossLives = 0;
+            
+            // Ensure Images are Visible (if loaded) or Emojis (if not)
+            document.getElementById('p1-img').style.display = 'block';
+            document.getElementById('p1-offline').style.display = 'none';
+            document.getElementById('p2-img').style.display = 'block';
+            document.getElementById('p2-offline').style.display = 'none';
+
+            // Refresh src to trigger onerror if offline
             p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
+            document.getElementById('p1-img').src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif";
+            
+            state.bossLives = 0;
             
             if(state.gameMode === 'single') {
                 let enemyName = `PATOGEN LV.${state.level}`;
@@ -1286,18 +1083,23 @@
                 
                 // BOSS LEVEL LOGIC (LEVEL 5)
                 if (state.level === 5) {
-                    state.bossLives = 1; // 2 Lives Total
+                    state.bossLives = 1;
                     p2Char.classList.add('boss-mode'); 
                     p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria_superbug.gif";
+                    // Update boss emoji too just in case
+                    document.getElementById('p2-offline').innerText = '👽'; 
                     
                     if(!document.getElementById('revive-fx')) {
                         const fx = document.createElement('div');
                         fx.id = 'revive-fx';
                         document.getElementById('scene-area').appendChild(fx);
                     }
+                } else {
+                    document.getElementById('p2-offline').innerText = '👾';
                 }
             } else {
                 document.getElementById('level-indicator').innerText = "";
+                document.getElementById('p2-offline').innerText = '👾';
             }
             updateUI();
             nextQuestion();
@@ -1358,8 +1160,19 @@
 
         function scheduleAITurn() {
             if (state.aiTimer) clearTimeout(state.aiTimer);
-            let minDelay = Math.max(2000, 6000 - (state.level * 800));
-            let maxDelay = Math.max(4000, 9000 - (state.level * 800));
+            
+            let minDelay, maxDelay;
+
+            if (state.level >= 3 && state.level <= 4) {
+                // UPDATE: Logika khusus untuk Level 3 dan 4 (3-5 detik)
+                minDelay = 3000;
+                maxDelay = 5000;
+            } else {
+                // Logika default untuk level lainnya
+                minDelay = Math.max(2000, 6000 - (state.level * 800));
+                maxDelay = Math.max(4000, 9000 - (state.level * 800));
+            }
+
             let delay = Math.floor(Math.random() * (maxDelay - minDelay + 1) + minDelay);
 
             state.aiTimer = setTimeout(() => {
@@ -1388,7 +1201,7 @@
                 if (state[player].frozen) btn.disabled = true;
                 btn.onclick = () => {
                     if (state.locked || state[player].frozen) return;
-                    if (state[player].inPenalty) return; // Anti-Spam Check
+                    if (state[player].inPenalty) return; 
                     handleAnswer(player, opt.c, btn, qData.q);
                 };
                 container.appendChild(btn);
@@ -1399,40 +1212,55 @@
             if (state.locked) return;
             if (state.aiTimer) clearTimeout(state.aiTimer);
             const opponent = player === 'p1' ? 'p2' : 'p1';
+            
             if (player === 'p2' && state.gameMode === 'single') {
                 const aiDiv = document.getElementById('p2-answers');
                 aiDiv.innerHTML = isCorrect ? '<div style="color:#00aa00; text-align:center; font-weight:bold;">AI MENYERANG!</div>' : '<div style="color:red; text-align:center; font-weight:bold;">AI SALAH!</div>';
             }
+
             if (isCorrect) {
                 state.locked = true;
                 if(btn) btn.style.backgroundColor = 'var(--btn-correct)';
                 state.history[player].push(questionText);
                 state[player].streak++;
-                let damage = 15;
+                
+                let damage = 10;
                 let isCritical = false;
-                if (state[player].streak >= 3) { damage = 30; isCritical = true; state[player].streak = 0; }
+                if (state[player].streak >= 3) { damage = 20; isCritical = true; state[player].streak = 0; }
+                
+                playSound('sfx-attack');
                 attackAnim(player, opponent, isCritical);
+                
                 state[opponent].hp -= damage;
                 state[player].atp += 25;
-                setTimeout(() => { updateUI(); state.qIndex++; nextQuestion(); }, 1500);
+                updateUI();
+
+                if (state[opponent].hp <= 0) {
+                    setTimeout(nextQuestion, 1200); 
+                } else {
+                    setTimeout(() => { state.qIndex++; nextQuestion(); }, 1500);
+                }
+
             } else {
                 state[player].inPenalty = true; 
-                if(btn) { 
-                    btn.style.backgroundColor = 'var(--btn-wrong)'; 
-                }
+                if(btn) { btn.style.backgroundColor = 'var(--btn-wrong)'; }
                 const allBtns = document.querySelectorAll(`#${player}-answers .btn-rpg`);
                 allBtns.forEach(b => b.disabled = true);
                 
                 state[player].streak = 0;
-                state[player].hp -= 10; 
-                showDamage(player, "-10 (PENALTY!)", false);
+                state[player].hp -= 5;
+                showDamage(player, "-5 (PENALTY!)", false);
                 updateUI();
                 
+                if (state[player].hp <= 0) {
+                    state.locked = true;
+                    setTimeout(gameOver, 1000); 
+                    return; 
+                }
+
                 setTimeout(() => {
                     state[player].inPenalty = false;
-                     allBtns.forEach(b => {
-                        if (b !== btn) b.disabled = false;
-                     });
+                     allBtns.forEach(b => { if (b !== btn) b.disabled = false; });
                 }, 1500);
 
                 if (state.gameMode === 'single' && state.level >= 4 && player === 'p1') {
@@ -1467,24 +1295,36 @@
             const char1 = document.getElementById(`${attacker}-char`);
             const char2 = document.getElementById(`${defender}-char`);
             
+            // Handle GIF Swap logic or Fallback Animation
             if (attacker === 'p1') {
                 const p1Img = document.getElementById('p1-img');
-                const idleSrc = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif";
-                p1Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune_attack.gif";
-                setTimeout(() => {
-                    p1Img.src = idleSrc;
-                }, 1000); 
+                // Only swap if image is visible (not fallback)
+                if(p1Img.style.display !== 'none') {
+                    const idleSrc = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif";
+                    p1Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune_attack.gif";
+                    setTimeout(() => { p1Img.src = idleSrc; }, 1000); 
+                }
             }
 
             const moveVal = attacker === 'p1' ? '50px' : '-50px';
             char1.style.transform = `translateX(${moveVal}) ${attacker === 'p2' ? 'scaleX(-1)' : ''}`;
             setTimeout(() => {
-                let damageText = isCrit ? "CRITICAL! -30" : "-15";
+                let damageText = isCrit ? "CRITICAL! -20" : "-10";
+                playSound('sfx-hit');
                 showDamage(defender, damageText, isCrit);
                 const targetImg = document.getElementById(`${defender}-img`);
-                if(targetImg) {
+                
+                // Add flash only if image is visible
+                if(targetImg && targetImg.style.display !== 'none') {
                     targetImg.classList.add('damage-flash');
                     setTimeout(() => targetImg.classList.remove('damage-flash'), 400);
+                } else {
+                    // Flash effect for fallback emoji
+                    const emoji = document.getElementById(`${defender}-offline`);
+                    if(emoji) {
+                        emoji.style.filter = "brightness(50%) sepia(100%) saturate(1000%) hue-rotate(-50deg)";
+                        setTimeout(() => emoji.style.filter = "drop-shadow(0 0 10px rgba(255,255,255,0.5))", 400);
+                    }
                 }
                 char2.classList.add('shake');
                 char1.style.transform = attacker === 'p2' ? 'scaleX(-1)' : 'none';
@@ -1510,6 +1350,7 @@
             let cost = id === 1 ? 50 : 80;
             if (state[player].atp < cost) return;
             state[player].atp -= cost;
+            playSound('sfx-skill');
             updateUI();
             if (id === 1) {
                 if (player === 'p1') {
@@ -1554,6 +1395,7 @@
         }
 
         function gameOver() {
+            stopAllBGM(); // Stop music
             if (state.aiTimer) clearTimeout(state.aiTimer);
             const modal = document.getElementById('game-over-screen');
             const txt = document.getElementById('winner-text');
@@ -1568,12 +1410,14 @@
             if (state.gameMode === 'single') {
                 if (state.p1.hp > 0) {
                     if (state.level >= 5) {
+                        playSound('sfx-win');
                         txt.innerText = "MISSION COMPLETE!";
                         txt.style.color = 'gold';
                         nextBtn.style.display = 'none';
                         restartBtn.innerText = "MAIN LAGI";
                         sendDataToSheet("P1 (CHAMPION - Lv.5 Clear)");
                     } else {
+                        playSound('sfx-win');
                         txt.innerText = `LEVEL ${state.level} CLEAR!`;
                         txt.style.color = 'gold';
                         nextBtn.style.display = 'block'; 
@@ -1581,6 +1425,7 @@
                         sendDataToSheet("P1 (Lv." + state.level + " Clear)");
                     }
                 } else {
+                    playSound('sfx-lose');
                     txt.innerText = "GAME OVER";
                     txt.style.color = 'red';
                     nextBtn.style.display = 'none';
@@ -1588,6 +1433,7 @@
                     sendDataToSheet("AI Wins (Lv." + state.level + ")");
                 }
             } else {
+                playSound('sfx-win');
                 txt.innerText = `${winnerName} WINS!`;
                 txt.style.color = winnerColor;
                 nextBtn.style.display = 'none';
@@ -1611,6 +1457,17 @@
         }
 
         function sendDataToSheet(winnerName) {
+            // OFFLINE GUARD
+            if (!navigator.onLine) {
+                const statusDiv = document.getElementById('upload-status');
+                if (statusDiv) {
+                    statusDiv.style.display = 'block';
+                    statusDiv.innerText = "⚠️ Mode Offline: Data tidak disimpan ke server.";
+                    statusDiv.style.color = '#ccc';
+                }
+                return;
+            }
+
             if(!GOOGLE_SCRIPT_URL) return;
             const statusDiv = document.getElementById('upload-status');
             statusDiv.style.display = 'block';
@@ -1629,7 +1486,12 @@
                 body: JSON.stringify(payload)
             })
             .then(() => { statusDiv.innerText = "✅ Data Berhasil Disimpan!"; statusDiv.style.color = '#00ff00'; })
-            .catch(err => { console.error(err); statusDiv.innerText = "❌ Gagal Mengirim Data"; statusDiv.style.color = 'red'; });
+            .catch(err => { 
+                // Silent catch for network errors
+                console.error(err); 
+                statusDiv.innerText = "⚠️ Gagal koneksi (Data Lokal Saja)"; 
+                statusDiv.style.color = 'orange'; 
+            });
         }
 
         function populateSummary(player) {
@@ -1651,24 +1513,23 @@
         }
 
         function resetGame() {
+            stopAllBGM(); // Reset music state
+            
             if (state.aiTimer) clearTimeout(state.aiTimer);
             if (state.typeWriterInterval) clearInterval(state.typeWriterInterval);
             state = { p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 }, p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 }, qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] }, gameMode: 'single', level: 1, aiTimer: null, bossLives: 0, wrongAttempts: 0 };
             
-            const p2Char = document.getElementById('p2-char');
-            if (p2Char) {
-                p2Char.classList.remove('boss-mode');
-                p2Char.style.transform = 'scaleX(-1)';
-            }
-            
-            const p1Char = document.getElementById('p1-char');
-            if (p1Char) {
-                 const sprite = p1Char.querySelector('.character-sprite') || p1Char;
-                 if(sprite.style) sprite.style.transform = 'none';
-            }
-
+            // RESET IMAGES
             const p2Img = document.getElementById('p2-img');
-            if (p2Img) p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
+            p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
+            const p1Img = document.getElementById('p1-img');
+            p1Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/sistemimune.gif";
+
+            // RESET FALLBACKS
+            p1Img.style.display = 'block';
+            p2Img.style.display = 'block';
+            document.getElementById('p1-offline').style.display = 'none';
+            document.getElementById('p2-offline').style.display = 'none';
 
             document.getElementById('p1-input-name').value = "";
             document.getElementById('p1-input-class').value = "";
@@ -1694,8 +1555,9 @@
             document.getElementById('scene-area').style.opacity = '1';
             document.getElementById('control-panel').style.opacity = '1';
             
-            // SHOW TITLE SCREEN
+            // SHOW TITLE SCREEN & PLAY MENU BGM
             document.getElementById('title-screen').style.display = 'flex';
+            playBGM('menu');
 
             setMode('single'); 
             
@@ -1704,7 +1566,8 @@
         }
 
         async function openLeaderboard() {
-            document.getElementById('title-screen').style.display = 'none'; // Hide Title
+            if(!navigator.onLine) { alert("Leaderboard tidak tersedia saat Offline."); return; }
+            document.getElementById('title-screen').style.display = 'none'; 
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('leaderboard-screen').style.display = 'flex';
             fetchLeaderboardData();
@@ -1712,7 +1575,7 @@
 
         function closeLeaderboard() {
             document.getElementById('leaderboard-screen').style.display = 'none';
-            document.getElementById('title-screen').style.display = 'flex'; // Back to Title
+            document.getElementById('title-screen').style.display = 'flex'; 
         }
 
         function fetchLeaderboardData() {
@@ -1729,12 +1592,10 @@
             window.handleLeaderboardResponse = function(json) {
                 try {
                     const rows = json.table.rows;
-
                     if (!rows || rows.length === 0) {
                         loading.innerText = "Belum ada data.";
                         return;
                     }
-
                     allLeaderboardData = rows.slice(1).reverse().map(row => {
                         const getCol = (idx) => (row.c[idx] ? (row.c[idx].v || "") : "-").toString();
                         return {
@@ -1745,10 +1606,8 @@
                             p2: { nama: getCol(7), kelas: getCol(8), sekolah: getCol(9), skor: getCol(10) }
                         };
                     });
-
                     populateSchoolFilter(allLeaderboardData);
                     applyFilters();
-                    
                     loading.style.display = 'none';
                 } catch (e) {
                     console.error(e);
@@ -1803,48 +1662,23 @@
                 const tr = document.createElement('tr');
                 let school = row.p1.sekolah;
                 if(school.length > 15) school = school.substring(0, 12) + '...';
-                
                 let winnerClass = 'win-patogen';
                 let winName = row.pemenang;
-                if (winName === row.p1.nama || (row.p1.nama && winName.includes(row.p1.nama)) || winName.toLowerCase().includes("imun") || winName.includes("Clear")) {
-                    winnerClass = 'win-imun';
-                }
-                
-                let modeBadge = row.mode === 'Singleplayer' 
-                    ? '<span class="mode-badge" style="border-color:cyan; color:cyan">SINGLE</span>' 
-                    : '<span class="mode-badge" style="border-color:orange; color:orange">VERSUS</span>';
-
+                if (winName === row.p1.nama || (row.p1.nama && winName.includes(row.p1.nama)) || winName.toLowerCase().includes("imun") || winName.includes("Clear")) { winnerClass = 'win-imun'; }
+                let modeBadge = row.mode === 'Singleplayer' ? '<span class="mode-badge" style="border-color:cyan; color:cyan">SINGLE</span>' : '<span class="mode-badge" style="border-color:orange; color:orange">VERSUS</span>';
                 let dateStr = row.waktu;
                 if(dateStr.includes('Date')) { dateStr = "Baru Saja"; } 
-
-                tr.innerHTML = `
-                    <td>${dateStr}</td>
-                    <td>${modeBadge}</td>
-                    <td>
-                        <div style="color:cyan">${row.p1.nama} <span style="color:#aaa;font-size:0.5rem">(${school})</span></div>
-                        <div style="color:#666; font-size:0.5rem; font-weight:bold;">VS</div>
-                        <div style="color:orange">${row.p2.nama}</div>
-                    </td>
-                    <td>${row.p1.skor}-${row.p2.skor}</td>
-                    <td style="color:${winnerClass === 'win-imun' ? 'cyan' : 'red'}">${row.pemenang}</td>
-                `;
+                tr.innerHTML = `<td>${dateStr}</td><td>${modeBadge}</td><td><div style="color:cyan">${row.p1.nama} <span style="color:#aaa;font-size:0.5rem">(${school})</span></div><div style="color:#666; font-size:0.5rem; font-weight:bold;">VS</div><div style="color:orange">${row.p2.nama}</div></td><td>${row.p1.skor}-${row.p2.skor}</td><td style="color:${winnerClass === 'win-imun' ? 'cyan' : 'red'}">${row.pemenang}</td>`;
                 tableBody.appendChild(tr);
             });
         }
 
-        // --- GAME STARTUP ---
         setMode('single'); 
-        
         window.onload = async () => {
-            // Wait for assets to load
             await preloadImages();
-            
-            // Fade out loading screen
             const overlay = document.getElementById('loading-overlay');
             overlay.style.opacity = '0';
-            setTimeout(() => {
-                overlay.style.display = 'none';
-            }, 500);
+            setTimeout(() => { overlay.style.display = 'none'; }, 500);
         };
 
     </script>
