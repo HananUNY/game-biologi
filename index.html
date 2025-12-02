@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIO-WAR: RPG Edition (Fixed UI)</title>
+    <title>BIO-WAR: RPG Edition (Ver.8)</title>
+    <link rel="preload" as="image" href="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/background_title%20and%20menu_web.png">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -42,7 +43,18 @@
             flex-direction: column;
         }
 
-        /* --- PAUSE MENU BUTTON (REPLACES OLD GROUP) --- */
+        /* --- BACKGROUND MENU CLASS (FIXED) --- */
+        /* Ditambahkan !important untuk menimpa background milik class .modal */
+        .menu-bg-style {
+            background: 
+                linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.3)), 
+                url('https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/background_title%20and%20menu_web.png') !important;
+            background-size: cover !important;
+            background-position: center !important;
+            background-repeat: no-repeat !important;
+        }
+
+        /* --- PAUSE MENU BUTTON --- */
         #menu-btn {
             position: fixed;
             top: 5px;
@@ -57,7 +69,7 @@
             font-size: 0.7rem;
             cursor: pointer;
             border-radius: 5px;
-            display: none; /* Hidden on start screen */
+            display: none; 
             box-shadow: 0 0 5px #000;
         }
         #menu-btn:hover { background: var(--gold); color: #000; }
@@ -126,7 +138,7 @@
 
         .center-hud {
             text-align: center;
-            margin-top: 40px; /* Pushed down to avoid Menu Button overlap */
+            margin-top: 40px; 
             pointer-events: none;
         }
 
@@ -283,6 +295,13 @@
             white-space: nowrap;
         }
 
+        /* --- TITLE SCREEN ANIMATIONS --- */
+        @keyframes titleFloat {
+            0% { transform: translateY(0) scale(1); text-shadow: 4px 4px 0 #a00; }
+            50% { transform: translateY(-10px) scale(1.05); text-shadow: 6px 6px 0 #a00, 0 0 20px gold; }
+            100% { transform: translateY(0) scale(1); text-shadow: 4px 4px 0 #a00; }
+        }
+
         /* --- MODAL GENERAL --- */
         .modal {
             position: fixed; top:0; left:0; width:100%; height:100%;
@@ -298,7 +317,62 @@
         
         .modal h1 { color: gold; font-size: 2rem; margin: 20px 0; text-shadow: 4px 4px 0 #a00; }
         
-        /* BUTTONS */
+        /* TITLE SCREEN SPECIFIC */
+        .title-text {
+            font-size: 3rem;
+            color: gold;
+            text-align: center;
+            margin-bottom: 40px;
+            animation: titleFloat 3s infinite ease-in-out;
+            line-height: 1.5;
+        }
+        
+        .title-footer {
+            position: absolute;
+            bottom: 20px;
+            font-size: 0.6rem;
+            color: #aaa;
+            text-shadow: 1px 1px 0 #000;
+        }
+
+        .title-btn-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            max-width: 400px;
+            align-items: center;
+        }
+
+        .big-menu-btn {
+            width: 100%;
+            padding: 20px;
+            font-size: 1.2rem;
+            background: linear-gradient(to bottom, #d2691e, #8b4500);
+            border: 4px solid white;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            cursor: pointer;
+            box-shadow: 0 6px 0 #3e2723, 0 10px 10px rgba(0,0,0,0.5);
+            transition: all 0.1s;
+        }
+        .big-menu-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3e2723; }
+
+        .small-menu-btn {
+            width: 80%;
+            padding: 15px;
+            font-size: 0.8rem;
+            background: #0088cc;
+            border: 2px solid white;
+            color: white;
+            font-family: 'Press Start 2P', cursive;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #005580;
+            transition: all 0.1s;
+        }
+        .small-menu-btn:active { transform: translateY(4px); box-shadow: none; }
+        
+        /* BUTTONS GENERAL */
         .btn-row { 
             display: flex; 
             justify-content: center; 
@@ -361,7 +435,7 @@
 
         /* FORM */
         .player-form {
-            flex: 1; background: rgba(0,0,0,0.3); border: 2px solid #fff; padding: 15px; border-radius: 8px;
+            flex: 1; background: rgba(0,0,0,0.5); border: 2px solid #fff; padding: 15px; border-radius: 8px;
             transition: all 0.3s; min-width: 300px;
         }
         .player-form.hidden { display: none; }
@@ -447,7 +521,7 @@
 
         @media only screen and (orientation: portrait) {
             #rotate-warning { display: flex; }
-            #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel, #menu-btn { display: none !important; }
+            #title-screen, #start-screen, #game-over-screen, #tutorial-screen, #leaderboard-screen, #settings-screen, #scene-area, #control-panel, #menu-btn { display: none !important; }
         }
 
         /* RESPONSIVE MOBILE LANDSCAPE */
@@ -492,6 +566,12 @@
             .q-list-item { font-size: 0.5rem; line-height: 1.2; }
             #menu-btn { padding: 5px 10px; font-size: 0.5rem; top: 2px; }
             .pause-menu-btn { font-size: 0.8rem; padding: 10px; }
+            
+            /* TITLE SCREEN MOBILE */
+            .title-text { font-size: 1.5rem; margin-bottom: 20px; }
+            .big-menu-btn { padding: 10px; font-size: 0.8rem; }
+            .small-menu-btn { padding: 8px; font-size: 0.6rem; }
+            .title-btn-container { gap: 10px; }
         }
     </style>
 </head>
@@ -517,9 +597,20 @@
         <p style="font-size: 0.8rem; line-height: 1.5; max-width: 80%;">Silakan putar perangkat Anda ke posisi horizontal (Landscape).</p>
     </div>
 
-    <!-- START SCREEN (LOGIN) -->
-    <div id="start-screen" class="modal">
-        <h1>BIO-WAR<br>RPG</h1>
+    <!-- NEW TITLE SCREEN -->
+    <div id="title-screen" class="modal menu-bg-style">
+        <div class="title-text">BIO-WAR<br>RPG</div>
+        <div class="title-btn-container">
+            <button class="big-menu-btn" onclick="showLoginScreen()">▶️ MASUK GAME</button>
+            <button class="small-menu-btn" onclick="openSettings()">⚙️ PENGATURAN SOAL</button>
+            <button class="small-menu-btn" style="background:#0066cc;" onclick="openLeaderboard()">🏆 SKOR (LEADERBOARD)</button>
+        </div>
+        <div class="title-footer">Dikembangkan oleh Tim SMA Negeri 1 Bantul</div>
+    </div>
+
+    <!-- START SCREEN (LOGIN / INPUT FORM) -->
+    <div id="start-screen" class="modal menu-bg-style" style="display: none;">
+        <h1 style="font-size:1.5rem; margin-bottom:10px;">IDENTITAS PEMAIN</h1>
         
         <div class="mode-selector">
             <button id="mode-single" class="mode-btn active" onclick="setMode('single')">1 PLAYER (Lawan AI)</button>
@@ -571,12 +662,11 @@
         </div>
 
         <div class="btn-row">
-            <button class="secondary-btn settings-btn" onclick="openSettings()">⚙️ GANTI SOAL</button>
+            <button class="secondary-btn settings-btn" onclick="backToTitle()">🔙 KEMBALI</button>
             <button id="start-game-btn" class="start-btn" onclick="validateAndStart()">
                 <div id="btn-spinner" class="spinner"></div>
-                <span id="btn-text">▶️ MULAI GAME</span>
+                <span id="btn-text">SIAP MAIN ▶️</span>
             </button>
-            <button class="secondary-btn leaderboard-btn" onclick="openLeaderboard()">🏆 SKOR</button>
         </div>
     </div>
 
@@ -787,13 +877,9 @@
             const modal = document.getElementById('pause-modal');
             if (modal.style.display === 'none') {
                 modal.style.display = 'flex';
-                // Pause AI if needed? AI timer persists but won't act if locked. 
-                // Currently game is turn based so true pausing isn't critical, but we can block interaction.
                 state.locked = true; 
             } else {
                 modal.style.display = 'none';
-                // Unlock only if it wasn't locked by gameplay
-                // For simplicity, we just unlock. If in middle of anim, it might glitch slightly but safe for turn based.
                 state.locked = false;
             }
         }
@@ -801,6 +887,17 @@
         function confirmExitFromPause() {
             togglePauseMenu(); // close menu
             resetGame(); // direct exit
+        }
+
+        function showLoginScreen() {
+            document.getElementById('title-screen').style.display = 'none';
+            document.getElementById('start-screen').style.display = 'flex';
+            focusInput('p1-input-name');
+        }
+
+        function backToTitle() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('title-screen').style.display = 'flex';
         }
 
         function setMode(mode) {
@@ -823,6 +920,7 @@
         }
 
         function openSettings() {
+            document.getElementById('title-screen').style.display = 'none';
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('settings-screen').style.display = 'flex';
             focusInput('custom-sheet-id');
@@ -830,8 +928,7 @@
 
         function closeSettings() {
             document.getElementById('settings-screen').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'flex';
-            focusInput('p1-input-name');
+            document.getElementById('title-screen').style.display = 'flex'; // Back to Title
         }
 
         function saveCustomSheet() {
@@ -1413,7 +1510,6 @@
             if (state.typeWriterInterval) clearInterval(state.typeWriterInterval);
             state = { p1: { hp: 100, atp: 0, frozen: false, name: "IMUN", class: "-", school: "-", streak: 0 }, p2: { hp: 100, atp: 0, frozen: false, name: "PATOGEN", class: "-", school: "-", streak: 0 }, qIndex: 0, questions: [], locked: false, typeWriterInterval: null, history: { p1: [], p2: [] }, gameMode: 'single', level: 1, aiTimer: null, bossLives: 0, wrongAttempts: 0 };
             
-            // FORCE RESET BOSS VISUAL (SAFE CHECK)
             const p2Char = document.getElementById('p2-char');
             if (p2Char) {
                 p2Char.classList.remove('boss-mode');
@@ -1422,12 +1518,10 @@
             
             const p1Char = document.getElementById('p1-char');
             if (p1Char) {
-                 // Use optional chaining or check style existence
                  const sprite = p1Char.querySelector('.character-sprite') || p1Char;
                  if(sprite.style) sprite.style.transform = 'none';
             }
 
-            // RESET IMAGES TO DEFAULT
             const p2Img = document.getElementById('p2-img');
             if (p2Img) p2Img.src = "https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/bacteria.gif";
 
@@ -1443,7 +1537,7 @@
             const btn = document.getElementById('start-game-btn');
             const spinner = document.getElementById('btn-spinner');
             const btnText = document.getElementById('btn-text');
-            if (btnText) btnText.innerText = "▶️ MULAI GAME";
+            if (btnText) btnText.innerText = "SIAP MAIN ▶️";
             if (btn) btn.disabled = false;
             if (spinner) spinner.style.display = 'none';
 
@@ -1451,19 +1545,21 @@
             document.getElementById('menu-btn').style.display = 'none';
 
             document.getElementById('game-over-screen').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('start-screen').style.display = 'none';
             document.getElementById('scene-area').style.opacity = '1';
             document.getElementById('control-panel').style.opacity = '1';
+            
+            // SHOW TITLE SCREEN
+            document.getElementById('title-screen').style.display = 'flex';
 
             setMode('single'); 
             
             const upStat = document.getElementById('upload-status');
             if(upStat) upStat.style.display = 'none';
-
-            focusInput('p1-input-name');
         }
 
         async function openLeaderboard() {
+            document.getElementById('title-screen').style.display = 'none'; // Hide Title
             document.getElementById('start-screen').style.display = 'none';
             document.getElementById('leaderboard-screen').style.display = 'flex';
             fetchLeaderboardData();
@@ -1471,7 +1567,7 @@
 
         function closeLeaderboard() {
             document.getElementById('leaderboard-screen').style.display = 'none';
-            document.getElementById('start-screen').style.display = 'flex';
+            document.getElementById('title-screen').style.display = 'flex'; // Back to Title
         }
 
         function fetchLeaderboardData() {
@@ -1592,7 +1688,9 @@
         }
 
         setMode('single'); 
-        window.onload = () => focusInput('p1-input-name');
+        window.onload = () => {
+             // NO OP (handled by initial HTML state)
+        };
 
     </script>
 </body>
