@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIO-WAR: RPG Edition (Secured)</title>
+    <title>BIO-WAR: RPG Beta Edition (v.0.9.02)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/favicon.png">
     <style>
         :root {
             --bg-color: #2b2b2b;
@@ -285,7 +286,7 @@
     <audio id="sfx-skill" src="Retro_Charge_Magic 11.wav"></audio> <!-- Suara Skill -->
     <audio id="sfx-win" src="Victory.mp3"></audio> <!-- Suara Menang -->
     <audio id="sfx-lose" src="Death.mp3"></audio> <!-- Suara Kalah -->
-
+    
     <!-- LOADING OVERLAY -->
     <div id="loading-overlay">
         <div class="loading-title">BIO-WAR RPG</div>
@@ -339,8 +340,8 @@
         <h1>TENTANG</h1>
         <div class="modal-box about-content">
             <div class="about-section-title">INFO GAME</div>
-            <div>Versi: v9.01 (Audio Update)</div>
-            <div>Tanggal Diupdate: 02 Desember 2025</div>
+            <div>Versi: v0.9.02 (Update Keamaanan Leaderboard)</div>
+            <div>Tanggal Diupdate: 03 Desember 2025</div>
             <div>Pengembang: Tim SMA Negeri 1 Bantul</div>
 
             <div class="about-section-title">ATRIBUSI ASET</div>
@@ -348,7 +349,7 @@
                 <li>Background: Generated AI (Gemini Nano Banana)</li>
                 <li>Karakter Imun: <a href="https://craftpix.net/freebies/free-pixel-art-tiny-hero-sprites/?utm_campaign=Website&utm_source=itch.io&utm_medium=public" target="_blank" class="about-link">Free Pixel Art Tiny Hero Sprites (Craftpix)</a></li>
                 <li>Karakter Bakteri: <a href="https://lin-ain.itch.io/slime" target="_blank" class="about-link">Slime (Lin-Ain @ itch.io)</a></li>
-                <li>Audio: Mixkit.co (Free License)</li>
+                <li>Audio: <a href="https://alkakrab.itch.io/free-25-fantasy-rpg-game-tracks-no-copyright-vol-2" target="_blank" class="about-link">Alkakrab (No Copyright)</a></li>
             </ul>
 
             <div class="about-section-title">KONTAK</div>
@@ -573,9 +574,19 @@
     </div>
 
     <script>
-        // --- KONFIGURASI SECURITY ---
-        // PENTING: Ubah kunci ini dan samakan dengan di Apps Script
-        const SECRET_KEY = "SABA_JAYA_2025_TIMSMAN1BANTUL_HASH89-012-19218318@2-1301MKiejqpkl"; 
+        // --- KONFIGURASI SECURITY (OBFUSCATED) ---
+        // Sembunyikan Secret Key agar tidak mudah dibaca manusia
+        // "GANTI_TEKS_INI_JADI_KODE_RAHASIA_ANDA_YANG_PANJANG_DAN_RUMIT"
+        
+        // Contoh Obfuscation Sederhana (Split String)
+        // Hacker tetap bisa menggabungkannya, tapi ini mencegah pencarian CTRL+F "SECRET_KEY"
+        const _k_parts = [
+          "SABA_", "JAYA_", "2025_", "TIMSMAN1BANTUL_", 
+          "HASH89-012-19218318@2-1301MKiejqpkl"
+        ];
+        
+        // Fungsi untuk mengambil kunci (digabungkan saat runtime)
+        const getSecret = () => _k_parts.join("");
 
         const DEFAULT_SHEET_ID = "1m8hcyvs319-Axrs4YhecyETxfO5AdmmARKfrqzEwgxY"; 
         const LEADERBOARD_SHEET_ID = "1EIPjukmLRefXrtNw5xscY3dO_cWZURRYyv1s9HbULHw"; 
@@ -1463,8 +1474,8 @@
         async function generateSignature(dataString) {
             try {
                 const encoder = new TextEncoder();
-                // Gabungkan data dengan Secret Key
-                const data = encoder.encode(dataString + SECRET_KEY);
+                // Gabungkan data dengan Secret Key (Didapatkan dari Obfuscation)
+                const data = encoder.encode(dataString + getSecret());
                 // Hash menggunakan SHA-256 (Standar Web Crypto API)
                 const hashBuffer = await crypto.subtle.digest('SHA-256', data);
                 const hashArray = Array.from(new Uint8Array(hashBuffer));
