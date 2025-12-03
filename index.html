@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>BIO-WAR: RPG Edition (Beta Version 0.9)</title>
+    <title>BIO-WAR: RPG Edition (Secured)</title>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
-    <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/HananUNY/game-biologi/refs/heads/main/favicon.png">
     <style>
         :root {
             --bg-color: #2b2b2b;
@@ -340,7 +339,7 @@
         <h1>TENTANG</h1>
         <div class="modal-box about-content">
             <div class="about-section-title">INFO GAME</div>
-            <div>Versi: v0.9.01 (Audio Update, Offline Support)</div>
+            <div>Versi: v9.01 (Audio Update)</div>
             <div>Tanggal Diupdate: 02 Desember 2025</div>
             <div>Pengembang: Tim SMA Negeri 1 Bantul</div>
 
@@ -349,7 +348,7 @@
                 <li>Background: Generated AI (Gemini Nano Banana)</li>
                 <li>Karakter Imun: <a href="https://craftpix.net/freebies/free-pixel-art-tiny-hero-sprites/?utm_campaign=Website&utm_source=itch.io&utm_medium=public" target="_blank" class="about-link">Free Pixel Art Tiny Hero Sprites (Craftpix)</a></li>
                 <li>Karakter Bakteri: <a href="https://lin-ain.itch.io/slime" target="_blank" class="about-link">Slime (Lin-Ain @ itch.io)</a></li>
-                <li>Audio: <a href="https://alkakrab.itch.io/free-25-fantasy-rpg-game-tracks-no-copyright-vol-2" target="_blank" class="about-link">Alkakrab (No Copyright)</a></li>
+                <li>Audio: Mixkit.co (Free License)</li>
             </ul>
 
             <div class="about-section-title">KONTAK</div>
@@ -574,10 +573,13 @@
     </div>
 
     <script>
-        // --- KONFIGURASI ---
+        // --- KONFIGURASI SECURITY ---
+        // PENTING: Ubah kunci ini dan samakan dengan di Apps Script
+        const SECRET_KEY = "SABA_JAYA_2025_TIMSMAN1BANTUL_HASH89-012-19218318@2-1301MKiejqpkl"; 
+
         const DEFAULT_SHEET_ID = "1m8hcyvs319-Axrs4YhecyETxfO5AdmmARKfrqzEwgxY"; 
         const LEADERBOARD_SHEET_ID = "1EIPjukmLRefXrtNw5xscY3dO_cWZURRYyv1s9HbULHw"; 
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw7GEOyPLUSQlVEPzS9NqC13sLppFsq4h23_xPtB3I4ae52tGZva3fzg3YM9lp3hF3P/exec"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxxGJjeVOV5li1kZHHI1Sggw7u1aft63tYFfVTktxhcMUeSqsitW-_oldc1PT6AMz82/exec"; 
         
         let activeSheetID = DEFAULT_SHEET_ID;
         let isCustomSheet = false;
@@ -1457,7 +1459,24 @@
             startGame();
         }
 
-        function sendDataToSheet(winnerName) {
+        // --- NEW SECURITY FUNCTION ---
+        async function generateSignature(dataString) {
+            try {
+                const encoder = new TextEncoder();
+                // Gabungkan data dengan Secret Key
+                const data = encoder.encode(dataString + SECRET_KEY);
+                // Hash menggunakan SHA-256 (Standar Web Crypto API)
+                const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                // Convert ke Hex string
+                return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (error) {
+                console.error("Crypto Error:", error);
+                return "error_generating_signature";
+            }
+        }
+
+        async function sendDataToSheet(winnerName) {
             // OFFLINE GUARD
             if (!navigator.onLine) {
                 const statusDiv = document.getElementById('upload-status');
@@ -1474,12 +1493,31 @@
             statusDiv.style.display = 'block';
             statusDiv.innerText = "⏳ Sedang mengirim data ke server...";
             statusDiv.style.color = 'yellow';
+
+            const gameModeText = state.gameMode === 'single' ? 'Singleplayer' : 'Multiplayer';
+            const scoreP1 = state.history.p1.length;
+            const scoreP2 = state.history.p2.length;
+            
+            // 1. Ambil Timestamp saat ini (Anti Replay Attack)
+            const timestamp = Date.now().toString();
+
+            // 2. Buat string unik untuk di-signature
+            // Urutan harus SAMA PERSIS dengan di Apps Script:
+            // Mode + Winner + ScoreP1 + ScoreP2 + Timestamp + SECRET_KEY (di dalam fungsi generate)
+            const stringToSign = `${gameModeText}${winnerName}${scoreP1}${scoreP2}${timestamp}`;
+
+            // 3. Generate Token
+            const token = await generateSignature(stringToSign);
+
             const payload = {
-                mode: state.gameMode === 'single' ? 'Singleplayer' : 'Multiplayer',
+                mode: gameModeText,
                 winner: winnerName,
-                p1Name: state.p1.name, p1Class: state.p1.class, p1School: state.p1.school, p1Score: state.history.p1.length,
-                p2Name: state.p2.name, p2Class: state.p2.class, p2School: state.p2.school, p2Score: state.history.p2.length
+                p1Name: state.p1.name, p1Class: state.p1.class, p1School: state.p1.school, p1Score: scoreP1,
+                p2Name: state.p2.name, p2Class: state.p2.class, p2School: state.p2.school, p2Score: scoreP2,
+                timestamp: timestamp, // Kirim waktu
+                signature: token      // Kirim token verifikasi
             };
+
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
                 mode: 'no-cors',
@@ -1488,7 +1526,6 @@
             })
             .then(() => { statusDiv.innerText = "✅ Data Berhasil Disimpan!"; statusDiv.style.color = '#00ff00'; })
             .catch(err => { 
-                // Silent catch for network errors
                 console.error(err); 
                 statusDiv.innerText = "⚠️ Gagal koneksi (Data Lokal Saja)"; 
                 statusDiv.style.color = 'orange'; 
@@ -1669,7 +1706,7 @@
                 let modeBadge = row.mode === 'Singleplayer' ? '<span class="mode-badge" style="border-color:cyan; color:cyan">SINGLE</span>' : '<span class="mode-badge" style="border-color:orange; color:orange">VERSUS</span>';
                 let dateStr = row.waktu;
                 if(dateStr.includes('Date')) { dateStr = "Baru Saja"; } 
-                tr.innerHTML = `<td>${dateStr}</td><td>${modeBadge}</td><td><div style="color:cyan">${row.p1.nama} <span style="color:#aaa;font-size:0.5rem">(${school})</span></div><div style="color:#666; font-size:0.5rem; font-weight:bold;">VS</div><div style="color:orange">${row.p2.nama}</div></td><td>${row.p1.skor}-${row.p2.skor}</td><td style="color:${winnerClass === 'win-imun' ? 'cyan' : 'red'}">${row.pemenang}</td>`;
+                tr.innerHTML = `<td>${dateStr}</td><td>${modeBadge}</td><td><div style="color:cyan">${row.p1.nama} <span style="color:#aaa;font-size:0.5rem">(${school})</span></div><div style="color:#666; font-size:0.5rem; font-weight:bold;">VS</div><div style="color:orange">${row.p2.nama}</div></td><td>${row.p1.skor}-${row.p2.skor}</td><td style="color:${winnerClass === 'win-imun' ? 'cyan' : 'red'}\">${row.pemenang}</td>`;
                 tableBody.appendChild(tr);
             });
         }
